@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板-下拉刷新</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        html,
+        body {
+            width: 100%;
+            background-color: transparent;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app" >
+        <header class="aui-bar aui-bar-nav theme-bg header-fix">
+            <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+            <div class="aui-title" style="display: flex; ">
+                <div style="margin: 0 auto; display: flex;">
+                    <div style="" v-text='title'></div>
+                </div>
+            </div>
+        </header>
+        <!--高度至少1px才能有效偏移-->
+        <div id='first-el' style="height: 1px; "></div>
+        <div class="" style="margin-top: 30px; color: white;">
+            嘿嘿嘿嘿嘿嘿嘿或或或或或
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板Frame',
+        },
+        methods: {
+
+
+        }
+    })
+
+</script>
+
+</html>

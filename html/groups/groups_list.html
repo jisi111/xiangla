@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 0.25rem; "></div>
+    <div class="flex-row" style="margin: 0.1rem; align-items: center; padding: 0.55rem; ">
+        <img src="../../image/group-cover-01.png" style="width: 2.15rem; height: 2.15rem; border-radius: 50%; ">
+        <div class="flex-col" style="margin-left: 0.5rem; ">
+            <span style="font-size: 0.8rem; ">Alice音乐中心</span>
+            <span style="font-size: 0.65rem; color: var(--theme-grey); ">成年即兴伴奏主力军</span>
+        </div>
+        <div class="flex-1"></div>
+        <span style="widtgh: 1.75rem; height: 1.05rem; text-align: center; font-size: 0.7rem ">+加入</span>
+    </div>
+    <div class="flex-row" style="margin: 0.1rem; align-items: center; padding: 0.55rem;">
+            <img src="../../image/group-cover-02.png" style="width: 2.2rem; height: 2.2rem; border-radius: 50%; ">
+            <div class="flex-col" style="margin-left: 0.5rem; ">
+                <span style="font-size: 0.8rem; ">美美画室</span>
+                <span style="font-size: 0.65rem; color: var(--theme-grey); ">水彩油墨</span>
+        </div>
+    <div class="flex-1"></div>
+        <span style="widtgh: 1.75rem; height: 1.05rem;font-size: 0.7rem  ">+加入</span>
+    </div>
+    <div class="flex-row" style="margin: 0.1rem; align-items: center; padding: 0.55rem;" >
+        <img src="../../image/group-cover-02.png" style="width: 2.15rem; height: 2.15rem; border-radius: 50%; ">
+            <div class="flex-col" style="margin-left: 0.5rem; ">
+                <span style="font-size: 0.8rem;  ">欣欣艺术培训中心</span>
+                <span style="font-size: 0.65rem; color: var(--theme-grey); ">欢迎加入欣欣艺术培训大家庭</span>
+        </div>
+        <div class="flex-1"></div>
+        <span style="widtgh: 1.75rem; height: 1.05rem;font-size: 0.7rem ">+加入</span>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+        },
+        methods: {
+            initData() {
+
+            },
+
+        }
+    })
+
+</script>
+
+</html>

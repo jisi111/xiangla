@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        .cash_body{
+          border-top: 0.43rem solid #f4f4f4;
+          padding:0rem 0.65rem;
+          overflow: hidden;
+        }
+        .cash_body>p{
+          color: var(--theme-black);
+          font-size: 0.78rem;
+          padding: 0.61rem 0rem;
+          border-bottom: 1px solid #f4f4f4;
+        }
+        p>span{
+          float: right;
+          color: var(--theme-grey);
+        }
+        .cash_body>p>.tel{
+            color: var(--theme-black);
+        }
+        .cash_describe{
+          padding-top: 0.65rem;
+        }
+        .cash_describe>p:first-child{
+          margin-bottom: 0.43rem;
+        }
+        .cash_describe>p{
+          color: var(--theme-grey);
+          font-size: 0.70rem;
+        }
+       .button{
+          background-color: #FFCE54 ;
+          border-radius: 1.31rem;
+          margin:1.09rem auto;
+          padding: 0.2rem 6.5rem;
+        }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <img style="width: 1rem; height: 1rem;" src="../../image/share-grey.png">
+        </a>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="cash_body">
+          <p>提现金额<span>输入提现金额</span></p>
+          <p>提现至<span>工商银行 尾号4402存蓄卡</span></p>
+          <p>手机号码<span class='tel'>138****0000</span></p>
+          <p>验证码<span>输入短信验证码</span></p>
+
+          <div class="cash_describe">
+            <p>工作日15:00前申请提现，2小时到账</p>
+            <p>15:00后提现，次日到账</p>
+            <div class="flex-row">
+              <div class="button">确定</div>
+            </div>
+
+
+          </div>
+
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+        },
+        methods: {
+            initData() {
+
+            },
+
+        }
+    })
+
+</script>
+
+</html>

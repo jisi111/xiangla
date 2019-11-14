@@ -1,0 +1,36 @@
+ <widget id="A6010570402381"  version="0.0.1">
+    <name>XiangLa</name>
+    <description>
+        Example For APICloud.
+    </description>
+    <author email="developer@apicloud.com" href="http://www.apicloud.com">
+        Developer
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <preference name="pageBounce" value="false"/>
+    <preference name="checkSslTrusted" value="false" />
+	<preference name="appBackground" value="rgba(0,0,0,0.0)"/>
+    <preference name="customRefreshHeader" value="UIPullRefreshMotive"/>
+	<preference name="windowBackground" value="rgba(0,0,0,0.0)"/>
+	<preference name="frameBackgroundColor" value="rgba(0,0,0,0.0)"/>
+	<preference name="hScrollBarEnabled" value="false"/>
+	<preference name="vScrollBarEnabled" value="false"/>
+	<preference name="autoLaunch" value="true"/>
+	<preference name="fullScreen" value="false"/>
+	<preference name="autoUpdate" value="true" />
+	<preference name="smartUpdate" value="false" />
+	<preference name="debug" value="true"/>
+	<preference name="statusBarAppearance" value="true"/>
+    <preference name="querySchemes" value="sinaweibohd,sinaweibo,weibosdk,weibosdk2.5" />
+
+	<permission name="readPhoneState" />
+	<permission name="camera" />
+	<permission name="record" />
+    <permission name="call"/>
+	<permission name="location" />
+	<permission name="fileSystem" />
+	<permission name="internet" />
+	<permission name="bootCompleted" />
+	<permission name="hardware" />    <meta-data         name="com.baidu.lbsapi.API_KEY"         value="DBY63cXDmQECQnOiqlMrXogtqSABlBEV" />    <feature name="aliPayPlus">        <param name="urlScheme" value="AliPayPlusA6010570402381" />    </feature>    <feature name="rongCloud2">        <param name="appKey" value="kj7swf8ok3ru2" />    </feature>    <feature name="bmLocation">        <param name="ios_api_key" value="QRM1rc0TEpQtDGzgkeLdSL9tggzcLqfR" />    </feature>    <feature name="QQPlus">        <param name="urlScheme" value="tencent101785796" />        <param name="apiKey" value="101785796" />    </feature>    <feature name="wx">        <param name="urlScheme" value="wxb1460f24c4d185c5"/>        <param name="apiKey" value="wxb1460f24c4d185c5"/>        <param name="apiSecret" value="fa60db59e2205ff3124d57c7056f0870"/>    </feature>    <feature name="wxPay">        <param name="urlScheme" value="wxb1460f24c4d185c5"/>        <param name="apiKey" value="wxb1460f24c4d185c5"/>        <param name="apiSecret" value="fa60db59e2205ff3124d57c7056f0870"/>    </feature>    <feature name="weiboPlus">        <param name="urlScheme" value="wb2217210140" />        <param name="apiKey" value="2217210140" />        <param name="registUrl" value="" />    </feature>    <intent-filter>        <action name="android.intent.action.VIEW"/>        <category name="android.intent.category.DEFAULT"/>        <data scheme="rong" host="io.rong.fast" pathPrefix="/conversation/"/>    </intent-filter>    <intent-filter>       <action name="android.intent.action.VIEW" />       <category name="android.intent.category.DEFAULT" />       <data host="com.chuangxin.xiangla" path="/conversationlist" scheme="rong" />    </intent-filter>    <intent-filter>        <action name="android.intent.action.VIEW" />        <category name="android.intent.category.DEFAULT" />        <data host="com.chuangxin.xiangla" pathPrefix="/push_message" scheme="rong" />    </intent-filter>
+</widget>

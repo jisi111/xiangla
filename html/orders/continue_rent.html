@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <img style="width: 1rem; height: 1rem;" src="../../image/share-grey.png">
+        </a>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="base-padding">
+      <div class="flex-row" style="border-bottom:1px solid  #F4F4F4;padding: 0.87rem 0 0.87rem 0;margin-top:1.31rem;" >
+            <div style="font-size:0.70rem;color:var(--theme-black)">租期</div>
+          <div class="flex-1">
+          </div>
+          <input type="radio" name="pay" class="aui-radio" id='pay' value='1'>
+          <label for="pay" style="color:var(--theme-black);font-size:0.70rem;margin:0.11rem 1.84rem 0 0.31rem">6个月</label>
+          <input type="radio" name="pay" class="aui-radio" id='pay' value='1'>
+          <label for="pay" style="color:var(--theme-black);font-size:0.70rem;margin:0.11rem 0 0 0.31rem;">12个月</label>
+      </div>
+      <div class="flex-row"style="padding:0.70rem 0;">
+        <div style="font-size:0.70rem;color:var(--theme-black)">租金</div>
+        <div class="flex-1"></div>
+        <div style="font-size:0.70rem;color:#E51C23;">￥300</div>
+      </div>
+      <div class="grey-line"></div>
+      <div class="flex-row"style="margin-top:7.23rem;margin-bottom:0.74rem;">
+        <div style="font-size:0.70rem;color:var(--theme-black)">租金总额</div>
+        <div class="flex-1"></div>
+        <div style="font-size:0.70rem;color:#E51C23;">￥3600</div>
+      </div>
+      <div class="grey-line"></div>
+      <div class="flex-row"style="padding:0.70rem 0;">
+        <div style="font-size:0.70rem;color:var(--theme-black)">押金</div>
+        <div class="flex-1"></div>
+        <div style="font-size:0.70rem;color:#E51C23;">￥30000</div>
+      </div>
+      <div class="grey-line"></div>
+      <div class="flex-row" style="padding:0.35rem 0 ;">
+        <div class="flex-1"></div>
+        <span style="font-size:0.70rem;color:var(--theme-black);margin-top:0.60rem;">合计</span>
+        <div style="font-size:1.28rem;color:#E51C23;">￥33600</div>
+      </div>
+      <div class="grey-line"></div>
+      <div class="flex-row"style="padding:0.70rem 0;">
+        <div style="font-size:0.70rem;color:var(--theme-black)">起租期</div>
+        <div class="flex-1"></div>
+        <div style="font-size:0.70rem;color:var(--theme-black)">2019-07-08</div>
+      </div>
+      <div class="grey-line"></div>
+      <div class="flex-row"style="padding:0.70rem 0;">
+        <div style="font-size:0.70rem;color:var(--theme-black)">结束期</div>
+        <div class="flex-1"></div>
+        <div style="font-size:0.70rem;color:var(--theme-black)">2020-06-30</div>
+      </div>
+      <div class="grey-line"></div>
+
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+        },
+        methods: {
+            initData() {
+
+            },
+
+        }
+    })
+
+</script>
+
+</html>

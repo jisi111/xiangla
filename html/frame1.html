@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板-下拉刷新</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <style>
+        .aui-tab-item {
+            padding: 0 0.5rem;
+            font-size: 0.7rem;
+            color: white !important;
+        }
+        .aui-active {
+            font-weight: bold;
+            color: white;
+            border-bottom: 2px solid #515151 !important;
+        }
+        .tab-bottom {
+            width: 1.5rem;
+            height: 2px;
+            margin: 0 auto;
+            background-color: #515151;
+        }
+        .tab-bottom-active {
+            background-color: white;
+        }
+        .shadow1{
+        padding-left:0.26rem;
+        padding-top: 0.35rem;
+        padding-right:0.26rem;
+        position: absolute;
+        width:100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        }
+        .shadow1 p{
+          color:var(--theme-color);
+          font-size: 0.43rem;
+        }
+        .shadow1{
+          bottom: 0;
+          left: 0;
+        }
+        .record{
+          position: fixed;
+          bottom: 10px;
+          width: 4.8rem;
+          height: 1.75rem;
+          background-color: #3AB2BF;
+          right: 1.09rem;
+          border-radius: 1.31rem;;
+          text-align: center;
+          line-height: 1.75rem;
+          font-size: 0.61rem;
+          color: var(--theme-color);
+        }
+        .record>img{
+          width: 0.65rem;
+          height: 0.65rem;
+          float: left;
+          margin-left: 0.57rem;
+          margin-top: 0.43rem;
+          vertical-align: center;
+        }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <div class="flex-row" id='topLine'  style="margin-top:0.65rem; padding-left:0.65rem;padding-right:0.65rem;flex-wrap:wrap;">
+        <h1 style="color:var(--theme-yellow); width:100%; font-size:1.31rem;" class="flex-row"  >Recording</h1>
+        <p style="width:80%; margin-bottom:0.67rem; margin-top:0.43rem; color:var(-theme-black); font-size:0.78rem;">记录每一天的成长,分享交流相互勉励
+        学习不再是枯燥漫长的坚持...</p>
+        <div class="grey-line" ></div>
+    </div>
+
+    <div class="" style="width: 100%; "  v-for='(item, index) in planList'>
+      <div class="flex-row base-padding" style=' flex-wrap:wrap;  align-items:center;margin-top:1.31rem;' >
+        <div class="flex-col" style="" @click='gotoPlanDetail(item)'>
+            <p style="font-size:0.70rem;color:var(--theme-black); width:100%;" >
+                <span v-text='"@" + item.author.nickName'></span>
+                <span style='color:#64B5F6;font-size:0.70rem; margin-left:0.21rem;'>的目标宣言</span>
+            </p>
+            <div  v-text='item.title' style='font-size:0.87rem; margin-top:0.34rem; color:var(--theme-black); font-weight:700; '>
+                弹琴不是目标，目标是会弹琴</div>
+        </div>
+        <img :src="item.author.image" style="width:2.19rem;height:2.19rem; border-radius:50%; margin-left: auto;">
+      </div>
+      <!-- 3张图片 -->
+      <div class="flex-row base-padding " @click='gotoPlanDetail(item)'
+          style='margin-top: 0.85rem; margin-bottom:1.40rem;  width:100%; '>
+            <div class="" v-bind:style='{width: getWidth3(), marginLeft: getMargin(blogIndex)}' style="position:relative;"
+              v-for='(blogItem, blogIndex) in item.blogList' >
+              <!-- 第一个图片上的文字，比较大 -->
+              <div class="shadow1 " v-if='blogIndex == 0'>
+                  <p style="font-size:0.87rem;color:#FFCE54" v-text='"第" + blogItem.planDayNum + "天"'></p>
+                   <p class="aui-ellipsis-1" style="margin-bottom:0.20rem;" v-text='blogItem.content'></p>
+              </div>
+              <!-- 第2、3图片上的文字，比较小 -->
+              <div class="shadow1 " v-if='blogIndex != 0'>
+                  <p style="font-size:0.61rem; margin:0.21rem 0rem;" v-text='"第" + blogItem.planDayNum + "天"'></p>
+                   <p class="aui-ellipsis-1" style="margin-bottom:0.20rem;" v-text='blogItem.content'></p>
+              </div>
+              <img :src="blogItem.cover" v-bind:style='{width: getWidth3(), height: getWidth3()}' >
+            </div>
+      </div>
+      <div class="grey-line"></div>
+    </div>
+        <div class="record flex-row" @click='gotoSelectMedia'style="">
+            <img src="../image/record_frame.png" alt="">
+            <span style="margin-left:0.43rem;">我要记录</span>
+        </div>
+</div>
+</body>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../script/vue.min.js"></script>
+<script type="text/javascript" src="../script/constant.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+
+        vm.initData();
+
+        api.addEventListener({
+            name:'scrolltobottom',
+            extra:{
+                threshold: 0
+            }
+        }, function(ret, err){
+            // console.log('scrolltobottom');
+            vm.getNextPage();
+        });
+
+    };
+
+    function refreshData() {
+        vm.initData();
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            planList: [],
+            page: {
+                current: 1,
+                size: 10,
+                pages: 0,
+                total: 0
+            },
+        },
+        methods: {
+            initData() {
+                this.getPlanList();
+            },
+            getWidth3() {
+                return ((api.winWidth - 40) / 3) + 'px';
+            },
+            getMargin(index) {
+                console.log(index);
+                if (index == 0) {
+                    return '0px';
+                } else {
+                    return '10px';
+                }
+            },
+            getNextPage() {
+                if (this.page.current >= this.page.pages) {
+                    api.toast({
+                        msg: '没有更多内容',
+                        location: 'middle'
+                    });
+                    return;
+                }
+                this.page.current++;
+                this.getPlanList();
+            },
+            getPlanList() {
+                var that = this;
+                var params = {
+                    queryParams: {
+                    },
+                    page: that.page
+                };
+                console.log('params ' + JSON.stringify(params));
+                api.showProgress({
+                    title: '加载中...',
+                });
+                ajaxPost('/plan/getList', params, function(ret, err) {
+                    api.hideProgress();
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.page = ret.data.page;
+                            if (that.page.current == 1) {
+                                that.planList = ret.data.list;
+                            } else {
+                                that.planList.push.apply(that.planList, ret.data.list);
+                                api.pageDown(function( ret, err ){});
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            gotoPlanDetail(item) {
+                api.openWin({
+                    name: 'plan_detail',
+                    url: './plan/plan_detail.html',
+                    pageParam: {
+                        planId: item.id
+                    },
+                    reload: true
+                });
+            },
+            gotoSelectMedia() {
+                $api.rmStorage('selectedMediaList');// 清空已选图片、视频
+                api.openWin({
+                    name: 'select_media',
+                    url: './blog/select_media.html',
+                    pageParam: {
+                        publishType: 'plan',
+                        isPlan: true
+                    },
+                    reload: true
+                });
+            },
+
+
+        }
+    })
+
+</script>
+
+</html>

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        .input-div {
+            background-image: url(../../image/input-left-bg.png);
+            background-repeat:no-repeat;
+            background-size:100% 100%;
+        }
+        input[type=text] {
+            background:transparent;
+            border: none;
+            padding-left: 1rem;
+        }
+        input[type=text]:focus {
+            background:transparent;
+            border-color: var(--theme-yellow);
+            padding-left: 1rem;
+        }
+        .input-style2 {
+            margin-left: 0.8rem;
+            border-radius: 1.5rem;
+            /*border-color: var(--theme-light-grey);*/
+            border-color: var(--theme-yellow);
+            background-color: var(--theme-yellow);
+        }
+        .input-style2:focus {
+            margin-left: 0.8rem;
+            background-color: var(--theme-light-grey);
+            border-color: var(--theme-light-grey);
+        }
+        .comment-btn {
+            width: 3.85rem;
+            background-image: url(../../image/btn-right-bg.png);
+            background-repeat:no-repeat;
+            background-size:100% 100%;
+            color: white;
+            display: flex;
+            flex-grow: row;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <img style="width: 1rem; height: 1rem;" src="../../image/share-grey.png">
+        </a>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="base-padding">
+        <div class="flex-row " style="align-items: center; margin-top: 0.85rem;">
+            <img :src="message.author.image" style="width: 2.155rem; height: 2.155rem; border-radius: 50%; ">
+            <div class="flex-col" style="margin-left: 0.5rem; ">
+                <span style="font-size: 0.7rem;"v-text='message.author.nickName'></span>
+                <span style="font-size: 0.6rem; color: var(--theme-grey);" v-text='message.createTime'></span>
+            </div>
+            <div class="" style="flex: 1;"></div>
+            <div v-if='message.isFollowed == 0' class="follow-btn" @click='addFollow(message)'>
+                关注
+            </div>
+            <div v-if='message.isFollowed == 1' class="follow-al-btn" @click='delectFollow(message)'>
+                已关注
+            </div>
+        </div>
+        <div class="" style="font-size: 0.8rem; margin-top: 1rem; ">
+            <div class="" v-text='message.content'>
+                不请老师的原因有三：降低成本。既包括钱，也包括时间。因为给孩子安排的课比较多，如果都请老师或去外面学
+            </div>
+            <div class="" style="width: 100%; " v-if='message.mediaType == 1' v-for='(imageItem, imageIndex) in message.imageList'>
+                <img :src="imageItem" style="width: 100%; height: auto; margin-top: 0.5rem; ">
+            </div>
+            <div class="" style="width: 100%; " v-if='message.mediaType == 2' >
+                <img :src="message.cover" style="width: 100%; height: auto; margin-top: 0.5rem; ">
+            </div>
+        </div>
+        <!-- <div class="flex-row" style="margin-top: 0.5rem; ">
+            <div class="flex-row" style="color: #1094DD; align-items: center; ">
+                <img src="../../image/groups.png" style="width: 0.75rem; height: 0.75rem; ">
+                <span style="margin-left: 0.25rem; font-size: 0.7rem; ">Alice音乐中心</span>
+            </div>
+            <div class="flex-row" style="color: #967ADC; align-items: center; margin-left: 10%;">
+                <img src="../../image/person-idle.png" style="width: 0.75rem; height: 0.75rem; ">
+                <span style="margin-left: 0.25rem; font-size: 0.7rem; ">个人闲置乐器</span>
+            </div>
+        </div> -->
+        <div class="flex-row flex-between" style="width: 100%; padding: 1.25rem 0 0.85rem 0; color: var(--theme-grey); ">
+            <div class="flex-row" style="align-items: center; ">
+                <span style=" font-size: 0.7rem; ">浏览</span>
+                <span style="margin-left: 0.15rem; font-size: 0.7rem; " v-text='message.clickNum'></span>
+            </div>
+            <div class="flex-row" style="align-items: center; ">
+                <span style="font-size: 0.7rem; "v-text='message.likeNum'></span>
+                <img v-if='message.isLiked == 0 || message.isLiked == undefined' src="../../image/like.png" @click='addLike(message)' style="width: 0.9rem; height: 0.9rem; margin-left: 0.15rem; ">
+                <img v-if='message.isLiked == 1' src="../../image/like-focus.png" @click='delLike(message)' style="width: 0.9rem; height: 0.9rem; margin-left: 0.15rem;">
+            </div>
+        </div>
+    </div>
+    <div class="grey-line" style="height: 0.5rem;"></div>
+
+    <div class="base-padding" style='font-size: 0.8rem; font-weight: bold; margin: 0.5rem 0;'>
+        <span v-text='"互动留言&middot;" + message.commentNum'></span>
+    </div>
+    <div class="grey-line" ></div>
+
+    <!-- 评论输入 -->
+    <div class="flex-row base-padding" style="align-items: center; margin: 0.5rem 0 1rem; align-items: center;">
+        <img src="../../image/user-photo.png" style="width: 2rem; height: 2rem; border-radius: 50%; ">
+        <div class="flex-row" style="flex: 1; margin-left: 0.5rem; height: 1.75rem; ">
+            <div class="input-div flex-row" style="flex: 1; height: 100%; align-items: center;">
+                <input type="text" class="input-style1" v-model='level1Comment' style="width: 100%;">
+            </div>
+            <div class="comment-btn" @click='addLevel1Comment' style="font-size:0.78rem">
+                留言
+            </div>
+        </div>
+    </div>
+
+    <!-- 评论列表 -->
+    <div class="" style="margin: 0.7rem 0; font-size: 0.7rem; " v-for='(item, index) in commentList'>
+        <!-- 用户头像、昵称、时间 -->
+        <div class="flex-row base-padding" style="align-items: center; margin-top: 1.3rem;">
+            <img :src="item.commentator.image" style="width: 2rem; height: 2rem; border-radius: 50%; ">
+            <div class="flex-col" style="margin-left: 0.5rem; ">
+                <span style="font-size: 0.7rem; " v-text='item.commentator.nickName'></span>
+                <span style="font-size: 0.6rem; color: var(--theme-grey); " v-text='getFormatTime(item.createTime)'></span>
+            </div>
+            <div class="" style="flex: 1;"></div>
+            <div class="flex-row" style="color: var(--theme-grey); ">
+                <span v-text='item.likeNum'></span>
+                <img src="../../image/like.png" style="width: 1rem; height: 1rem; margin-left: 0.15rem;">
+            </div>
+        </div>
+        <!-- 评论内容 -->
+        <div class="flex-row" style="margin-top: 0.5rem; padding-left: 3rem;">
+            <span style="" v-text='item.content' @click='showLevel2Input(item)'></span>
+        </div>
+        <!-- 2级评论内容 -->
+        <div class="flex-row" style="margin-top: 0.5rem; padding: 0 0.5rem 0 3rem;"
+            v-for='(subItem, subIndex) in item.level2CommentList'
+            @click='gotoLevel2(subItem)'>
+            <div class="base-padding flex-row" style="width: 100%; align-items: center; background-color: var(--theme-light-grey); ">
+                <!-- 作者 -->
+                <div v-if='subItem.commentator.id == message.authorId'
+                    style="padding: 0.25rem 0; color: #1094DD; ">
+                    <span style="font-weight: bold;" v-text='subItem.commentator.nickName'></span>
+                    <span>(作者):</span>
+                </div>
+                <div v-if='subItem.commentator.id != message.authorId'
+                    style="padding: 0.25rem 0; color: var(--theme-grey); ">
+                    <span style="font-weight: bold; color: var(--theme-black); " v-text='subItem.commentator.nickName'></span>
+                    <span>:</span>
+                </div>
+                <!-- 内容 -->
+                <span v-text='subItem.content' style="margin-left: 0.15rem;"></span>
+            </div>
+        </div>
+        <div v-if='item.level2CommentList.length > 1' class="flex-row" style="margin-top: 0.5rem; padding: 0 0.5rem 0 3rem; color: #1094DD;">
+            <span style="font-weight: bold; ">查看</span>
+            <span v-text='item.level2CommentList.length'></span>
+            <span style="font-weight: bold; ">条回复&nbsp;&gt;</span>
+        </div>
+    </div>
+    <div class="grey-line"></div>
+
+    <div class="" @click='gotoLevel1' style="text-align: center; font-size: 0.8rem; padding: 1rem 0.5rem;">
+        查看更多评论
+    </div>
+
+    <div class="base-padding " style="background-color: var(--theme-light-grey); ">
+        <div class="" style="font-size: 0.8rem; font-weight: bold; padding: 0.85rem 0 0.35rem;">
+            您可能感兴趣
+        </div>
+        <div class="flex-row flex-between "  style="width: 100%; padding-bottom: 0.5rem; font-size: 0.7rem; color: var(--theme-grey); ">
+            <!-- 左侧列表 -->
+            <div class="" style="width: 49%;">
+                <div class="" style="width: 100%; " v-for='(item, recoindex) in interestedBlogList'
+                    v-if='recoindex % 2 == 0'>
+                    <div class="" style="width: 100%; background-color: white; padding-bottom: 0.5rem; margin-top: 0.5rem; " >
+                        <!-- 图片 -->
+                        <div class="" style="width: 100%; position: relative; ">
+                            <img :src="item.cover" style="width: 100%; height: auto; " @click='interestedClick(item)'>
+                            <div class="flex-row" v-if='item.mediaType == 2' @click='interestedClick(item)'
+                                style="z-index: 80; align-items: center; width: 100%; height: 100%; background-color: transparent; position: absolute; top: 0; right: 0;">
+                                <img src="../../image/video.png" style="width: 2rem; height: 2rem; margin: auto;">
+                            </div>
+                        </div>
+                        <!-- 内容 -->
+                        <span style="padding: 0.5rem 0.15rem; font-size: 0.65rem;" v-text='item.content' @click='blogClick(item)'></span>
+                        <!-- 用户头像、点赞 -->
+                        <div class="flex-row" style="align-items: center; font-size: 0.5rem; padding: 0 0.15rem; ">
+                            <img  :src="item.author.image"style="width: 0.85rem; height: 0.85rem; border-radius: 50%; ">
+                            <span style="margin-left: 0.15rem; "v-text='item.author.nickName'></span>
+                            <div class="" style="flex: 1;"></div>
+                            <div class="flex-row" style="align-items: center; ">
+                              <img v-if='item.isLiked == 0' src="../../image/like.png" @click='addInterestedBlogLike(item, recoindex)' style="width: 0.55rem; height: 0.55rem; ">
+                              <img v-if='item.isLiked == 1' src="../../image/like-focus.png" @click='delInterestedBlogLike(item, recoindex)' style="width: 0.55rem; height: 0.55rem; ">
+                              <span style="margin-left: 0.15rem; "v-text='item.likeNum'></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 右侧列表 -->
+            <div class="" style="width: 49%;">
+                <div class="" style="width: 100%; " v-for='(item, recoindex) in interestedBlogList'
+                    v-if='recoindex % 2 == 1'>
+                    <div class="" style="width: 100%; background-color: white; padding-bottom: 0.5rem; margin-top: 0.5rem; " >
+                        <!-- 图片 -->
+                        <div class="" style="width: 100%; position: relative; ">
+                            <img :src="item.cover" style="width: 100%; height: auto; " @click='interestedClick(item)'>
+                            <div class="flex-row" v-if='item.mediaType == 2' @click='interestedClick(item)'
+                                style="z-index: 80; align-items: center; width: 100%; height: 100%; background-color: transparent; position: absolute; top: 0; right: 0;">
+                                <img src="../../image/video.png" style="width: 2rem; height: 2rem; margin: auto;">
+                            </div>
+                        </div>
+                        <!-- 内容 -->
+                        <span style="padding: 0.5rem 0.15rem; font-size: 0.65rem;" v-text='item.content' @click='blogClick(item)'></span>
+                        <!-- 用户头像、点赞 -->
+                        <div class="flex-row" style="align-items: center; font-size: 0.5rem; padding: 0 0.15rem; ">
+                            <img  :src="item.author.image"style="width: 0.85rem; height: 0.85rem; border-radius: 50%; ">
+                            <span style="margin-left: 0.15rem; "v-text='item.author.nickName'></span>
+                            <div class="" style="flex: 1;"></div>
+                            <div class="flex-row" style="align-items: center; ">
+                              <img v-if='item.isLiked == 0' src="../../image/like.png" @click='addInterestedBlogLike(item, recoindex)' style="width: 0.55rem; height: 0.55rem; ">
+                              <img v-if='item.isLiked == 1' src="../../image/like-focus.png" @click='delInterestedBlogLike(item, recoindex)' style="width: 0.55rem; height: 0.55rem; ">
+                              <span style="margin-left: 0.15rem; "v-text='item.likeNum'></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        vm.blogId = params.blogId;
+        // vm.blogId = 97;
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.initData();
+
+        api.addEventListener({
+            name:'scrolltobottom',
+            extra:{
+                threshold: 0
+            }
+        }, function(ret, err){
+            // console.log('scrolltobottom');
+            vm.getInterestedNextPage();
+        });
+    };
+
+    function addLevel2CommentFunc(content) {
+        console.log('addLevel2CommentFunc ' + content);
+        vm.addLevel2Comment(content);
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '动态详情',
+            blogId: 0,
+            level1Comment: '',
+            level2Comment: '',
+            commentContent: '',
+            level2InputVisible: false,
+            commentList: [],
+            message:{
+                author: {},
+            },
+            interestedPage:{// 底部感兴趣的列表分页
+              current: 1,
+              size: 6,
+              pages: 0,
+              total: 0
+            },
+            interestedBlogList:[],// 底部感兴趣列表
+            commentPage:{
+              current: 1,
+              size: 5,
+              pages: 0,
+              total: 0
+            },
+            selectedComment: {},
+        },
+        methods: {
+            interestedClick(item) {
+                api.openWin({
+                    name: 'blog_detail',
+                    url: './blog_detail.html',
+                    pageParam: {
+                        blogId: item.id
+                    },
+                    reload: true
+                });
+            },
+            gotoLevel2(item) {
+                console.log(JSON.stringify(item));
+                api.openWin({
+                    name: 'level2_comment',
+                    url: '../comment/level2_comment.html',
+                    pageParam: {
+                        targetComment: item,
+                        topicId: this.blogId,
+                        topicType: 1,
+                        topicAuthorId: this.message.authorId
+                    }
+                });
+            },
+            gotoLevel1() {
+                api.openWin({
+                    name: 'level1_comment',
+                    url: '../comment/level1_comment.html',
+                    pageParam: {
+                        topicId: this.blogId,
+                        topicType: 1,
+                        authorId: this.message.authorId
+                    }
+                });
+            },
+            showLevel2Input(item) {
+                this.selectedComment = item;
+                api.openFrame({
+                    name: 'comment_input_line',
+                    url: '../comment/comment_input_line.html',
+                    bgColor: 'rgba(0, 0, 0, 0.7)',
+                    pageParam: {
+                        ordersId: item.id,
+                        prevPage: 'blog_detail'
+                    },
+                    reload: true
+                });
+            },
+            getFormatTime(time) {
+                var startDate = time.replace(new RegExp("-","gm"),"/");
+                var startDateM = (new Date(startDate)).getTime(); //得到毫秒数
+                return timeDiff(startDateM);
+            },
+            addLevel1Comment() {
+                var that = this;
+                var params = {
+                    topicId: that.blogId,
+                    topicType: 1,// 1博客，2商品
+                    level: 1,// 第一级评论
+                    content: that.level1Comment
+                }
+                ajaxPost('/comment/add', params, function(ret,arr){
+                  console.log(JSON.stringify(ret));
+                  if(ret){
+                        if(ret.returnCode == '1'){
+                            api.toast({
+                                msg: '评论成功',
+                                location: 'middle'
+                            });
+                            that.level1Comment = '';
+                            that.message.commentNum++;
+                            that.getCommentList();
+                        } else {
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  } else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+            addLevel2Comment(content) {
+                var that = this;
+                var params = {
+                    topicId: that.blogId,
+                    topicType: 1,// 1博客，2商品
+                    level: 2,// 第2级评论
+                    content: content,
+                    targetCommentId: that.selectedComment.id
+                }
+                ajaxPost('/comment/add', params, function(ret,arr){
+                  console.log(JSON.stringify(ret));
+                  if(ret){
+                        if (ret.returnCode == '1') {
+                            api.toast({
+                                msg: '评论成功',
+                                location: 'middle'
+                            });
+                            that.level2Comment = '';
+                            that.message.commentNum++;
+                            that.getCommentList();
+                        } else {
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  } else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+            getCommentList() {
+                var that = this;
+                var params = {
+                    queryParams: {
+                        topicId: that.blogId,
+                        topicType: 1
+                    },
+                    page: that.commentPage
+                }
+                console.log('params ' + JSON.stringify(params));
+                ajaxPost('/comment/getList', params, function(ret,arr){
+                  console.log('commentList ' + JSON.stringify(ret));
+                  if(ret){
+                        if (ret.returnCode == '1') {
+                            that.commentList = ret.data.list;
+                        } else {
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  } else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+            initData() {
+                this.getInfo();
+                this.getCommentList();
+                this.getInterestedList();
+            },
+            getInfo() {
+                var that = this;
+                ajaxPost('/blog/get', that.blogId + '', function(ret,arr){
+                  console.log(JSON.stringify(ret));
+                  if(ret){
+                        if(ret.returnCode == '1'){
+                            that.message=ret.data;
+                        }else{
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  }else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+            // 点击关注
+            addFollow(item){
+              var that = this;
+              ajaxPost('/follow/add',item.id + '',function(ret,err){
+                console.log(JSON.stringify(ret));
+                if(item.isFollowed==0){
+                  that.$set(that.message,'isFollowed',1)
+                }else{
+                  that.$set(that.message,'isFollowed',0)
+                }
+              })
+            },
+            // 取消关注
+            delectFollow(item){
+              var that = this;
+              ajaxPost('/follow/delete',item.id + '',function(ret,err){
+                console.log(JSON.stringify(ret));
+                if(item.isFollowed==0){
+                  that.$set(that.message,'isFollowed',1)
+                }else{
+                  that.$set(that.message,'isFollowed',0)
+                }
+              })
+            },
+            // 点赞
+            addLike(item) {
+                  var that =this;
+                  var params={
+                     objId: item.id,
+                     objType: 1
+                  };
+                  ajaxPost('/likes/add',params,function(ret,err){
+                    // console.log(JSON.stringify(ret));
+                      if(ret){
+                            if(ret.returnCode == '1'){
+                              if (item.isLiked == 0 || item.isLiked == undefined) {
+                                  that.$set(that.message, 'isLiked', 1);
+                                  var likeNum = item.likeNum+1;
+                                  that.$set(that.message, 'likeNum', likeNum);
+                              } else {
+                                  that.$set(that.message, 'isLiked', 0);
+                                  var likeNum = item.likeNum-1;
+                                  that.$set(that.message, 'likeNum', likeNum);
+                              }
+                            }else{
+                              api.toast({
+                                  msg: ret.returnMsg,
+                                  location: 'middle'
+                              });
+                            }
+                      }else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                      }
+                  })
+            },
+            // 取消点赞
+            delLike(item) {
+                  var that =this;
+                  var params={
+                    objId: item.id,
+                     objType: 1
+                  };
+                  ajaxPost('/likes/delete',params,function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if(ret){
+                          if(ret.returnCode == '1'){
+                            if (item.isLiked == 0 || item.isLiked == undefined) {
+                                that.$set(that.message, 'isLiked', 1);
+                                var likeNum = item.likeNum+1;
+                                that.$set(that.message, 'likeNum', likeNum);
+                            } else {
+                                that.$set(that.message, 'isLiked', 0);
+                                  var likeNum = item.likeNum-1;
+                                  that.$set(that.message, 'likeNum', likeNum);
+                            }
+                          }else{
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                          }
+                    }else {
+                      api.toast({
+                          msg: JSON.stringify(err),
+                          location: 'middle'
+                      });
+                    }
+                  })
+            },
+            // 该接口后台查询size为100，不需要翻页
+            getInterestedList() {
+                var that = this;
+                var params = {
+                    queryParams: {
+                        userId: $api.getStorage('userId')
+                    },
+                    page: that.interestedPage
+                };
+                console.log('params ' + JSON.stringify(params));
+                ajaxPost('/blog/getRecommendList', params, function(ret, err) {
+                    console.log('recommendBlogList ' + JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.interestedPage= ret.data.page;
+                            if (that.interestedPage.current == 1) {
+                                that.interestedBlogList = ret.data.list;
+                            } else {
+                                that.interestedBlogList.push.apply(that.interestedBlogList, ret.data.list);
+                                api.pageDown(function( ret, err ){});
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            getInterestedNextPage() {
+                console.log(JSON.stringify(this.interestedPage));
+                if (this.interestedPage.current >= this.interestedPage.pages) {
+                    api.toast({
+                        msg: '没有更多内容',
+                        location: 'middle'
+                    });
+                    return;
+                }
+                this.interestedPage.current++;
+                this.getInterestedList();
+            },
+
+        }
+    })
+
+</script>
+
+</html>

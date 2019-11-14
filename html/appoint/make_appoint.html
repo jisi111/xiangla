@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <style>
+        .reason {
+            font-size: 0.87rem;
+            color: var(--theme-black);
+            margin-top: 1.09rem;
+            font-weight: 700;
+            text-decoration: underline;
+        }
+
+        .base-set {
+            padding: 0.54rem 0.26rem 0.54rem 0.65rem;
+            font-size: 0.87rem;
+        }
+
+        .base-set input {
+
+            margin-right: 0.26rem;
+        }
+
+        input::-webkit-input-placeholder {
+            /* placeholder颜色  */
+            color: var(--theme-grey);
+            /* placeholder位置  */
+            text-align: right;
+            font-size: 0.78rem;
+        }
+        .button{
+          height: 2.19rem;
+          width: 16.7rem;
+          border-radius: 1.31rem;
+          margin:2.36rem auto;
+          text-align: center;
+          line-height: 2.19rem;
+          color:var(--theme-color);
+          background-color: #3AB2BF ;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header class="aui-bar aui-bar-nav theme-bg header-fix">
+            <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+            <div class="aui-title" style="display: flex; ">
+                <div style="margin: 0 auto; display: flex;">
+                    <div style="" >零押金&sdot;租金分期预约</div>
+                </div>
+            </div>
+            <a class="aui-pull-right aui-btn">
+                <!-- <img style="width: 1rem; height: 1rem;" src="../../image/share-grey.png"> -->
+            </a>
+        </header>
+        <!--高度至少1px才能有效偏移-->
+        <div id='first-el' style="height: 1px; "></div>
+
+        <div class="base-padding">
+            <a href="#" class='reason' style=''>#为什么要预约？</a>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">姓名</div>
+            <div class="flex-1"></div>
+            <input type="text" placeholder="请填写你的姓名" style="width:70%;text-align:right; " v-model='appoint.name'>
+        </div>
+        <div class="grey-line"></div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;" >手机</div>
+            <div class="flex-1"></div>
+            <input type="number" placeholder="请填写你的手机号码" style="width:70%;text-align:right;"v-model='appoint.phone'>
+        </div>
+        <div class="grey-line"></div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">乐器种类</div>
+            <div class="flex-1"></div>
+            <input type="text" placeholder="填写你要租用的乐器名称" style="width:70%;text-align:right;" v-model='appoint.cateName'>
+        </div>
+        <div class="grey-line"></div>
+        <div class="flex-row base-set" @click='gotoExpireTime'>
+            <div style="margin-top:0.51rem;">用琴时间</div>
+            <div class="flex-1"></div>
+            <div style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;"
+                v-text="appoint.expireTime + '个月内'" ></div>
+            <img src="../../image/trangle.png" alt="" style="width:1.05rem;height:1.05rem;margin-top:0.51rem;" >
+        </div>
+        <div class="grey-line"></div>
+
+        <div class="flex-row base-set" @click='gotoRentTime'>
+            <div style="margin-top:0.51rem;">租期</div>
+            <div class="flex-1"></div>
+            <div style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;"
+                v-text="appoint.rentTime + '个月以上'" ></div>
+              <img src="../../image/trangle.png" alt="" style="width:1.05rem;height:1.05rem;margin-top:0.51rem;" >
+        </div>
+        <div class="grey-line"></div>
+
+        <div class="flex-row base-set" @click='gotoDepositRange'>
+            <div style="margin-top:0.51rem;" >可接受押金额度</div>
+            <div class="flex-1"></div>
+            <div style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;"
+                v-if='appoint.depositRange > 0' v-text="appoint.depositRange + '元以内'"></div>
+            <div style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;"
+                v-if='appoint.depositRange == 0' >只租用零押金的</div>
+            <img src="../../image/trangle.png" alt="" style="width:1.05rem;height:1.05rem;margin-top:0.51rem;">
+        </div>
+        <div class="grey-line"></div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">
+                预约金
+                <span style="color:#E51C23;" v-text="'￥' + appoint.totalAmount"></span>
+            </div>
+            <div class="flex-1"></div>
+            <div style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;">什么是预约金？</div>
+        </div>
+        <div class="grey-line"></div>
+        <div class='button'@click="makeAppoint">立即预约</div>
+    </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js"></script>
+<script type="text/javascript" src="../../script/aui-toast.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.initData();
+    };
+
+    function setExpireTime(val) {
+        vm.appoint.expireTime = val;
+    }
+
+    function setDepositRange(val) {
+        vm.appoint.depositRange = val;
+    }
+
+    function setRentTime(val) {
+        vm.appoint.rentTime = val;
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            appoint: {
+                name:'',
+                phone:'',
+                cateName:'',
+                totalAmount: '',
+                expireTime: 1,
+                rentTime: 6,
+                depositRange: 0,
+                payType: 1,
+            }
+        },
+        methods: {
+            initData() {
+                this.getPrice();
+            },
+            getPrice() {
+                var that = this;
+                ajaxPost('/appoint/getPrice', {}, function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if(ret){
+                        if(ret.returnCode == '1'){
+                          that.appoint.totalAmount = ret.data;
+                        }else{
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  }else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+            makeAppoint(){
+              var that = this;
+              var regName = /^[\u4E00-\u9FA5]{2,4}$/;
+              var regPhone =/^[1][3-9][0-9]{9}$/;
+              if(!regName.test(that.appoint.name)){
+                api.toast({
+                    msg: '请输入正确的姓名',
+                    location: 'middle'
+                });
+              }else if(!regPhone.test(that.appoint.phone)){
+                api.toast({
+                    msg: '请输入正确的电话号码',
+                    location: 'middle'
+                });
+              }else{
+                api.openWin({
+                    name: 'pay_appoint',
+                    url: './pay_appoint.html',
+                    pageParam: {
+                        appoint: that.appoint
+                    }
+                });
+              }
+            },
+            gotoExpireTime(){
+              api.openWin({
+                  name: 'expire_time',
+                  url: '../appoint/expire_time.html',
+                  pageParam: {
+                      expireTime: this.appoint.expireTime
+                  },
+                  reload: true
+              });
+            },
+          gotoRentTime(){
+            api.openWin({
+                name: 'rent_time',
+                url: '../appoint/rent_time.html',
+                pageParam: {
+                    rentTime: this.appoint.rentTime
+                },
+                reload: true
+            });
+          },
+          gotoDepositRange(){
+            api.openWin({
+                name: 'deposit_range',
+                url: '../appoint/deposit_range.html',
+                pageParam: {
+                    depositRange: this.appoint.depositRange
+                },
+                reload: true
+            });
+          },
+        }
+    })
+</script>
+
+</html>

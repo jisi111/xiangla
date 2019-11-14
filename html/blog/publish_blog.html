@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+    .div{
+        background-color: white;
+    }
+    .publish-img{
+        width:4.2rem;
+        height:4.2rem;
+        padding: 1px;
+        margin: 0.25rem 2px 0;
+        background-color: var(--theme-light-grey);
+    }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header id='header' class="aui-bar aui-bar-nav theme-bg header-fix" >
+            <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+            <div class="aui-title" style="display: flex; ">
+                <div style="margin: 0 auto; display: flex;">
+                    <div style="" v-text='title'></div>
+                </div>
+            </div>
+            <a class="aui-pull-right aui-btn" >
+                <div class="follow-btn" style="margin-left:1rem" @click='uploadMedia'>
+                    发布
+                </div>
+            </a>
+        </header>
+        <!--高度至少1px才能有效偏移-->
+        <div id='first-el' style="height: 1px; "></div>
+
+        <div class="flex-col">
+            <div class="" style="margin:1rem 1rem 0 1rem;padding:0 0 1rem 0">
+                <textarea placeholder="在此填写你的内容" v-model='content'
+                    style=" wrap:virtualcolor; color:var(--theme-black); font-size:0.78rem;height:9rem;"></textarea>
+            </div>
+            <div class="flex-row " style="width: 100%; flex-wrap: wrap; padding-left:0.74rem; background-color: white;">
+                <div class="publish-img" v-for='(item, index) in selectedMediaList'
+                    v-bind:style="{width: imgWidth, height: imgWidth} ">
+                    <img :src="item.thumbPath" style="width: 100%; max-height: 100%;">
+                </div>
+                <div class="publish-img flex-row" style="align-items: center; border-radius: 0.25rem; "
+                    v-if='mediaType != "video"'
+                    @click='gotoSelectMedia'
+                    v-bind:style="{width: imgWidth, height: imgWidth} ">
+                    <img src="../../image/plus-grey.png" style="width: 1.5rem; height: 1.5rem; margin: auto; ">
+                </div>
+            </div>
+
+            <!-- 记录周期 -->
+            <div class="flex-row base-padding" v-if='showPlanOption'
+                style="font-size: 0.7rem; margin-top: 1.31rem;">
+                <div class="" style="font-size: 0.8rem; ">记录周期:</div>
+                <input style='margin-left: 5%;' type="radio" name="isFirstHand" class="aui-radio" id='pay'
+                    v-model="planPeriod" value='100' >
+                <span style='margin-left: 0.25rem;'>100天</span>
+
+                <input style='margin-left: 5%;' type="radio" name="isFirstHand" class="aui-radio" id='pay'
+                    v-model="planPeriod" value='365'  >
+                <span style='margin-left: 0.25rem;'>365天</span>
+
+                <input style='margin-left: 5%;' type="radio" name="isFirstHand" class="aui-radio" id='pay'
+                    v-model="planPeriod" value='730' >
+                <span style='margin-left: 0.25rem;'>730天</span>
+            </div>
+            <div class="flex-row base-padding" v-if='showPlanOption'>
+                <div class="" style="margin-top: 1.31rem; background-color: var(--theme-grey); border-radius: 0.5rem; color: white; font-size: 0.52rem; padding: 0.15rem 0.5rem;">
+                    提示：记录周期只能选择一次
+                </div>
+            </div>
+
+            <!-- 城市 -->
+            <div class="flex-row base-padding" @click='showCityOption' style="align-items: center; font-size: 0.6rem; margin-top: 0.78rem; ">
+                <img src="../../image/area.png" style='width: 0.65rem; height: 0.65rem; margin-left: 0.25rem;' >
+                <div class="" style="margin-left: 0.25rem; " v-if='location != undefined'
+                    v-text='provinceName + "&sdot;" + cityName'>
+                </div>
+            </div>
+            <div class="grey-line" style="height: 0.5rem; margin-top: 0.78rem; "></div>
+
+            <!-- <div class="flex-row" style="margin-top:2rem;">
+                <div class="flex-row" style="margin-left:0.74rem;align-items: center;">
+                    <img src="../../image/qing.png" alt="" style="width:0.8rem; height:0.8rem;">
+                    <span style="font-size:0.78rem; margin-left: 0.43rem;">发布至啦群</span>
+                </div>
+                <div class="flex-1">
+                </div>
+                <div class="flex-row" style="margin-right:0.57rem;align-items: center;">
+                    <span style=" color: rgb(158, 158, 158); margin-right: 0.57rem;">去选择</span>
+                    <img src="../../image/back.png" alt="" style="width:0.5rem;height:0.5rem">
+                </div>
+            </div> -->
+
+        </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var UIAlbumBrowser;
+    var aliOSS;
+    var txShortVideo;
+
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.mediaType = params.mediaType;
+        if (params.isPlan) {
+            vm.isPlan = params.isPlan;
+        } else {
+            vm.isPlan = false;
+        }
+
+        UIAlbumBrowser = api.require('UIAlbumBrowser');
+        aliOSS = api.require("aliOSS");
+        txShortVideo = api.require('txShortVideo');
+
+        vm.initData();
+
+        api.addEventListener({
+            name:'viewappear'
+        }, function(ret, err){
+           // console.log('viewappear');
+           // 界面恢复后，刷新数据
+           vm.initData();
+        });
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '动态编辑',
+            location: {
+                province: '',
+                city: ''
+            },
+            provinceName: '',
+            districtCode: '',
+            cityName: '',
+            mediaType: '',
+            imgWidth: '0px',
+            content: '',
+            selectedMediaList: [],
+            successImageList: [],
+            imageNum: 0,
+            successImageCount: 0,
+            successVideoUrl: '',
+            coverPath: '',
+            coverUrl: '',
+            videoId: '',
+            videoDuration: 0,
+            isPlan: false,
+            showPlanOption: false,
+            planPeriod: 100,
+        },
+        methods: {
+            showCityOption() {
+                var that = this;
+                console.log('showCityOption');
+                var UIActionSelector = api.require('UIActionSelector');
+                UIActionSelector.open({
+                    datas: 'widget://res/city.json',
+                    layout: {
+                        row: 5,
+                        col: 3,
+                        height: 30,
+                        size: 12,
+                        sizeActive: 14,
+                        rowSpacing: 5,
+                        colSpacing: 10,
+                        maskBg: 'rgba(0,0,0,0.2)',
+                        bg: '#fff',
+                        color: '#888',
+                        // colorActive: '#f00',
+                        colorActive: '#3AB2BF',
+                        // colorSelected: '#f00'
+                        colorSelected: '#3AB2BF'
+                    },
+                    animation: true,
+                    cancel: {
+                        text: '取消',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    ok: {
+                        text: '确定',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    title: {
+                        text: '请选择',
+                        size: 12,
+                        h: 44,
+                        bg: '#eee',
+                        color: '#888'
+                    }
+                    // fixedOn: api.frameName
+                }, function(ret, err) {
+                    if (ret) {
+                        console.log(JSON.stringify(ret));
+                        that.provinceName = ret.selectedInfo[0].name;
+                        that.cityName = ret.selectedInfo[1].name;
+                        that.districtCode = ret.selectedInfo[2].id;// 区行政编码
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
+                });
+            },
+            gotoSelectMedia() {
+                api.execScript({
+                    name: 'select_media',
+                    script: 'switchImageOnly()'
+                });
+                api.openWin({
+                    name: 'select_media',
+                    url: './select_media.html',
+                    pageParam: {
+                        publishType: 'blog',
+                        imageOnly: true,
+                        addMode: true
+                    },
+                    reload: false
+                });
+            },
+            initData() {
+                this.imgWidth = ((api.winWidth - 40) / 4) + 'px';
+                // 读取选择的图片视频
+                this.selectedMediaList = $api.getStorage('selectedMediaList');
+                // 图片数量计算
+                this.imageNum = 0;
+                for (var i = 0; i < this.selectedMediaList.length; i++) {
+                    var item = this.selectedMediaList[i];
+                    if (item.mediaType == 'image' || item.mediaType == 'Image') {
+                        this.imageNum++;
+                    }
+                }
+
+                if (this.mediaType == 'video') {
+                    this.coverPath = this.selectedMediaList[0].thumbPath;
+                }
+
+                // 地理位置
+                if ($api.getStorage('location') != undefined) {
+                    this.location = $api.getStorage('location');
+                    this.cityName = this.location.city;
+                    this.districtCode = this.location.adCode;
+                    this.provinceName = this.location.province;
+                }
+
+                if (this.isPlan == true) {
+                    this.getCurrentPlan();
+                }
+            },
+            getCurrentPlan() {
+                var that = this;
+                ajaxPost('/plan/getCurrentPlan', {}, function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            if (ret.data == undefined) {
+                                that.showPlanOption = true;
+                            } else {
+                                that.showPlanOption = false;
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            uploadMedia() {
+                if (this.content == undefined || this.content == '') {
+                    api.toast({
+                        msg: '请输入内容',
+                        location: 'middle'
+                    });
+                    return;
+                }
+                if (this.mediaType == 'video') {
+                    this.uploadVideo();
+                } else {
+                    this.uploadImage();
+                }
+            },
+            uploadVideo() {
+                var that = this;
+                var item = that.selectedMediaList[0];
+                if (api.systemType == 'ios') {// ios要经过转换才能读取文件
+                    UIAlbumBrowser.transVideoPath({
+                        path: item.path
+                    }, function(ret, err) {
+                        if (ret.status == true) {
+                            item.path = ret.albumVideoPath;
+                            that.uploadSingleVideo(item);
+                        } else {
+                            api.toast({
+                                msg: '视频读取失败' + JSON.stringify(err),
+                                location: 'middle'
+                            });
+                        }
+                    });
+                } else {// android，直接上传
+                    that.uploadSingleVideo(item);
+                }
+            },
+            uploadSingleVideo(videoItem) {
+                var that = this;
+                api.showProgress({
+                    title: '发布中...'
+                });
+                txShortVideo.setLicence({
+                    licenceURL : txVideoLicenceUrl,
+                    licenceKey : txVideoLicenceKey
+                }, function(licRet, licErr){
+                    console.log(JSON.stringify(licRet) + " " + JSON.stringify(licErr));
+                    ajaxPost('/txVideo/getSign', {}, function(ret, err) {
+                        console.log(JSON.stringify(ret));
+                        if (ret) {
+                            if (ret.returnCode == '1') {
+                                var sign = ret.data;
+                                var srcFile = videoItem.path;
+                                var coverPath = videoItem.thumbPath;
+                                // console.log('sign ' + sign + ' srcFile ' + srcFile);
+                                console.log('srcFile ' + srcFile);
+                                txShortVideo.uploadLocalVideo({
+                                    signature: sign,
+                                    videoPath: srcFile,
+                                    coverPath: coverPath
+                                }, function(ret, err) {
+                                    // console.log(JSON.stringify(ret));
+                                    if (ret) {
+                                        if (ret.videoId) {
+                                            console.log(JSON.stringify(ret));
+                                            that.successVideoUrl = ret.videoURL;
+                                            that.coverUrl = ret.coverURL;
+                                            that.videoId = ret.videoId;
+                                            // that.videoDuration = parseInt(ret.duration / 1000);
+                                            that.publishBlog();
+                                        }
+                                    }
+                                    if (err) {
+                                        console.log(JSON.stringify(err));
+                                    }
+                                });
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    location: 'middle'
+                                });
+                                api.hideProgress();
+                            }
+                        } else {
+                            api.toast({
+                                msg: JSON.stringify(err),
+                                location: 'middle'
+                            });
+                            api.hideProgress();
+                        }
+                    })
+                });
+            },
+            uploadImage() {
+                var that = this;
+                that.successImageCount = 0;
+                that.successImageList = [];
+                api.showProgress({
+                    title: '发布中...'
+                });
+                aliOSS.init({
+                        endpoint: aliEndPoint,
+                        signUrl: hostIp + "/aliOss/getSign",
+                        bucketName: aliBucketName
+                    },
+                    function(ret, err) {
+                        console.log(JSON.stringify(ret));
+                        if (ret) {
+                            console.log(JSON.stringify(that.selectedMediaList));
+                            for (var i = 0; i < that.selectedMediaList.length; i++) {
+                                var item = that.selectedMediaList[i];
+                                if (item.mediaType != 'image' && item.mediaType != 'Image') {// 视频，另外处理
+                                    console.log('continue');
+                                    continue;
+                                }
+                                // ios要经过转换才能读取文件，needNoTranspath表示是FNPhotograph获取的图片，不需要转换
+                                if (api.systemType == 'ios'
+                                    && (item.needNoTranspath == false || item.needNoTranspath == undefined)) {
+                                    UIAlbumBrowser.transPath({
+                                        path: item.path
+                                    }, function(ret, err) {
+                                        if (ret) {
+                                            // 上传
+                                            var srcFile = ret.path;
+                                            var fileSuffix = srcFile.substring(srcFile.lastIndexOf('.'), srcFile.length);
+                                            // 上传后保存的文件名
+                                            var saveName = 'xiangla/blog/' + getTimeStr() + randomNum(1000, 9999) + fileSuffix;
+                                            console.log('saveName ' + saveName);
+                                            that.uploadSingleImage(srcFile, saveName);
+                                        } else {
+                                            api.toast({
+                                                msg: 'transPath ' + JSON.stringify(err),
+                                                location: 'middle'
+                                            });
+                                            api.hideProgress();
+                                            return;
+                                        }
+                                    });
+                                } else {// android，直接上传
+                                    var srcFile = item.path;
+                                    var fileSuffix = srcFile.substring(srcFile.lastIndexOf('.'), srcFile.length);
+                                    // 上传后保存的文件名
+                                    var saveName = 'xiangla/blog/' + getTimeStr() + randomNum(1000, 9999) + fileSuffix;
+                                    // console.log('saveName ' + saveName);
+                                    that.uploadSingleImage(srcFile, saveName);
+                                }
+                            }
+                        }
+                    }
+                );
+            },
+            // srcFile：上传文件，saveName：上传后的文件名，不包括域名前缀
+            uploadSingleImage(srcFile, saveName) {
+                var that = this;
+                aliOSS.upload({
+                        file: srcFile,
+                        name: saveName
+                    },
+                    function(ret, err) {
+                        // console.log(JSON.stringify(ret));
+                        if (ret) {
+                            if (ret.oper == "progress") {
+
+                            } else if (ret.oper == "complete") {
+                                // 上传图片计数
+                                that.successImageCount++;
+                                that.successImageList.push(imageDomain + '/' + saveName + '?x-oss-process=style/width360');
+                                console.log('successNum ' + that.successImageCount + ' imageNum ' + that.imageNum);
+                                if (that.successImageCount == that.imageNum) {
+                                    api.hideProgress();
+                                    that.publishBlog();
+                                }
+                            }
+                        }
+                        if (err) {
+                            api.toast({
+                                msg: err.msg,
+                                location: 'middle'
+                            });
+                        }
+                    }
+                );
+            },
+            publishBlog() {
+                var that = this;
+                var mediaType;
+                var coverUrl;
+                if (that.mediaType == 'image') {
+                    mediaType = 1;
+                    coverUrl = that.successImageList[0];// 第一张图作为封面
+                } else {
+                    mediaType = 2;
+                    coverUrl = that.coverUrl;// 视频封面
+                }
+
+                var params = {
+                    image: that.successImageList.join(','),
+                    videoId: that.videoId,
+                    // videoDuration: that.videoDuration,
+                    // video: that.successVideoUrl,
+                    cover: coverUrl,
+                    content: that.content,
+                    mediaType: mediaType,
+                    districtCode: that.districtCode,
+                    isPlan: that.isPlan,
+                    planPeriod: that.planPeriod
+                };
+                console.log('params ' + JSON.stringify(params));
+                api.showProgress({
+                    title: '加载中...'
+                });
+                ajaxPost('/blog/add', params, function(ret, err) {
+                    api.hideProgress();
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            if (mediaType == 1) {
+                                api.toast({
+                                    msg: '发布成功',
+                                    location: 'middle'
+                                });
+                            } else {
+                                api.toast({
+                                    msg: '视频审核中，请稍后查看',
+                                    location: 'middle'
+                                });
+                            }
+                            if (that.isPlan == true) {
+                                var blog = ret.data;
+                                // 跳转计划详情
+                                api.openWin({
+                                    name: 'plan_detail',
+                                    url: '../plan/plan_detail.html',
+                                    pageParam: {
+                                        planId: blog.planId
+                                    },
+                                    reload: true
+                                });
+                            } else {
+                                // 跳转首页
+                                setTimeout(function() {
+                                    api.closeToWin({
+                                        name: 'root'
+                                    });
+                                }, 500)
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+        }
+    })
+
+</script>
+
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板-下拉刷新</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        html,
+        body {
+            width: 100%;
+            background-color: transparent;
+        }
+        input[type=text] {
+            border-radius: 1.5rem;
+            background-color: var(--theme-light-grey);
+            border-color: var(--theme-light-grey);
+            padding-left: 0.5rem;
+        }
+        input[type=text]:focus {
+            background-color: var(--theme-light-grey);
+            border-color: var(--theme-light-grey);
+            padding-left: 0.5rem;
+        }
+    </style>
+</head>
+<body id='apply'>
+    <div id="app" class=" ">
+        <div class="flex-row" style="width: 100%; position: fixed; bottom: 0; align-items: center; padding: 0.5rem 0.65rem; background-color: white;">
+            <input type="text" id='commentInput' v-model='commentText' style="flex: 1; height: 2rem; " autofocus="autofocus" >
+            <div @click='addComment' style="width: 4rem; height: 1.8rem; line-height: 1.8rem; margin-left: 0.5rem; border-radius: 0.75rem; background-color: #E4007F; color:#FFFFFF;font-size: 0.8rem; text-align:center;">
+                发送
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.prevPage = params.prevPage;
+
+        setTimeout(function(){
+            $api.dom('#commentInput').focus();
+        }, 300);
+
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板Frame',
+            commentText: '',
+            prevPage: '',
+        },
+        methods: {
+            addComment() {
+                api.execScript({
+                    name: this.prevPage,
+                    script: 'addLevel2CommentFunc("' + this.commentText + '")'
+                });
+                api.closeFrame();
+            },
+        }
+    })
+
+</script>
+
+</html>

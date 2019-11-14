@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+    .base-set {
+        padding: 0.54rem 0 0.74rem 0;
+        font-size: 0.87rem;
+        border-bottom: 1px solid #F4F4F4
+    }
+    .btn{
+        margin-top:0.51rem;
+        width: 3.5rem;
+        height: 1.31rem;
+        border-radius: 1.31rem;
+        background-color: #9E9E9E;
+        font-size: 0.52rem;
+        color: #FFFFFF;
+        text-align: center;
+        line-height: 1.31rem;
+    }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='backClick' style="color: var(--theme-black);cursor:pointer;"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <!-- <img style="width: 1rem; height: 1rem;" src="../../image/share-grey.png"> -->
+        </a>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="" style="padding: 0 0.65rem;" v-if='appointVisible'>
+        <div class="flex-row base-set" style="font-size: 0.87rem；">
+            <div style="margin-top:0.51rem;color:#E51C23;font-weight:700;" >你的预约排号
+                <span style="color:#E51C23;" v-text="'第' + appoint.sort + '位'"></span>
+            </div>
+            <div class="flex-1"></div>
+            <div class="btn" @click='cancelAppoint'
+                style="width:3.5rem;height: 1.31rem;border-radius: 1.31rem;background-color:#9E9E9E;font-size: 0.52rem;color:#FFFFFF;" >
+                取消预约
+            </div>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">预约单号</div>
+            <div class="flex-1"></div>
+            <div v-text='appoint.id' style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;"></div>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">下单时间</div>
+            <div class="flex-1"></div>
+            <div v-text='appoint.createTime' style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;"></div>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">姓名</div>
+            <div class="flex-1"></div>
+            <div v-text='appoint.name' style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;">李茜</div>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">手机</div>
+            <div class="flex-1"></div>
+            <div v-text='appoint.phone' style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;">13666666666</div>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">乐器种类</div>
+            <div class="flex-1"></div>
+            <div v-text='appoint.cateName' style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;">钢琴</div>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">用琴时间</div>
+            <div class="flex-1"></div>
+            <div v-text='"提交预约单后" + appoint.expireTime + "个月内"' style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;"></div>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">租期</div>
+            <div class="flex-1"></div>
+            <div v-text='appoint.rentTime + "个月"' style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;"></div>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">可接受押金额度</div>
+            <div class="flex-1"></div>
+            <div v-if='appoint.depositRange > 0' v-text='appoint.depositRange + "元以内"'
+                style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;"></div>
+            <div v-if='appoint.depositRange == 0'
+                style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;">我只租用零押金的</div>
+        </div>
+        <div class="flex-row base-set">
+            <div style="margin-top:0.51rem;">预约金
+                <span style="color:#E51C23;" v-text='"￥" + appoint.totalAmount'></span>
+            </div>
+            <div class="flex-1"></div>
+            <div style="font-size:0.78rem;color:var(--theme-grey);margin-top:0.51rem;">已支付</div>
+        </div>
+    </div>
+
+    <div class="" v-if='!appointVisible' style="text-align: center; margin-top: 3rem;">
+        -当前无预约信息-
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        // vm.appoint.id = params.id;
+        // vm.appoint.id = 'AP201909092040398325'
+
+        vm.initData();
+
+        api.addEventListener({
+            name: 'swiperight'
+        }, function(ret, err) {
+            vm.backClick();
+        })
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '我的预约',
+            appoint: {
+                id: '',
+                name:'',
+                phone:'',
+                cateName:'',
+                totalAmount: '100',
+                expireTime: 1,
+                rentTime: 6,
+                depositRange: 0,
+                payType: 1,
+                sort: 0
+            },
+            appointVisible: false,
+        },
+        methods: {
+            initData() {
+                this.getDetail();
+            },
+            backClick() {
+                api.closeToWin({
+                    name: 'root'
+                });
+            },
+            cancelAppoint() {
+                var that = this;
+                var dialog = new auiDialog({})
+                dialog.alert({
+                    title:"提示",
+                    msg:'提前取消将不退还预约金，您确定取消吗?',
+                    buttons:['取消', '确定']
+                },function(ret){
+                    console.log(JSON.stringify(ret));
+                    if (ret.buttonIndex == 2) {
+                        ajaxPost('/appoint/cancel', that.appoint.id, function(ret,err){
+                            console.log(JSON.stringify(ret));
+                            if(ret){
+                                if(ret.returnCode == '1'){
+                                    api.toast({
+                                        msg: '取消成功',
+                                        location: 'middle'
+                                    });
+                                    that.appointVisible = false;
+                                } else{
+                                  api.toast({
+                                      msg: ret.returnMsg,
+                                      location: 'middle'
+                                  });
+                                }
+                          }else {
+                            api.toast({
+                                msg: JSON.stringify(err),
+                                location: 'middle'
+                            });
+                          }
+                        })
+                    }
+                })
+            },
+            getDetail() {
+                var that = this;
+                ajaxPost('/appoint/getMyAppoint', that.appoint.id, function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if(ret){
+                        if(ret.returnCode == '1'){
+                            if (ret.data == undefined) {
+                                that.appointVisible = false;
+                            } else {
+                                that.appoint = ret.data;
+                                that.appointVisible = true;
+                            }
+                        }else{
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  }else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+
+        }
+    })
+
+</script>
+
+</html>

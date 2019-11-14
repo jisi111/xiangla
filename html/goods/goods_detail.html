@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        .confirm-btn {
+            width: 90%;
+            height: 2rem;
+            line-height: 2rem;
+            background-color: var(--theme-yellow);
+            border-radius: 1rem;
+            color: var(--theme-black);
+            font-size: 0.87rem;
+            text-align: center;
+        }
+        .rent-time-btn {
+            width: 70px;
+            height: 26px;
+            line-height: 26px;
+            background-color: white;
+            border-radius: 15px;
+            color: var(--theme-black);
+            font-size: 14px;
+            text-align: center;
+            border: 1px solid var(--theme-grey);
+        }
+        .rent-active {
+            background-color: var(--theme-yellow);
+            border: none;
+        }
+        input[type=text] {
+            background-image: url(../../image/input-left-bg.png);
+            background-repeat:no-repeat;
+            background-size:100% 100%;
+            border: none;
+            padding-left: 1rem;
+        }
+        input[type=text]:focus {
+            background-image: url(../../image/input-left-bg.png);
+            background-repeat:no-repeat;
+            background-size:100% 100%;
+            border: none;
+            padding-left: 1rem;
+        }
+        .comment-btn {
+            width: 4rem;
+            background-image: url(../../image/btn-right-bg.png);
+            background-repeat:no-repeat;
+            background-size:100% 100%;
+            color: white;
+            display: flex;
+            flex-grow: row;
+            justify-content: center;
+            align-items: center;
+        }
+        .yanjian {
+            width: 5rem;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            background-color: #E4007F;
+            border-radius: 0.75rem;
+            color: white;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+        .hands-bg {
+            background-color: #FF4081;
+            border-radius: 0.75rem;
+            color: white;
+            font-size: 0.6rem;
+            padding: 0.1rem 0.5rem;
+        }
+        .btn-bg {
+            width: 4.5rem;
+            height: 1.75rem;
+            line-height: 1.75rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header id='header' class="aui-bar aui-bar-nav theme-bg header-fix">
+            <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+            <div class="aui-title" style="display: flex; ">
+                <div style="margin: 0 auto; display: flex;">
+                    <div style="" v-text='title'></div>
+                </div>
+            </div>
+            <a class="aui-pull-right aui-btn" @click='showShareOption'>
+                <img style="width: 1.3rem; height: 1.3rem;" src="../../image/share-grey.png">
+            </a>
+        </header>
+        <!--高度至少1px才能有效偏移-->
+        <div id='first-el' style="height: 1px; "></div>
+
+        <!-- 顶部视频 -->
+        <div class="" v-if='goodsDetail.video != undefined' @click='playVideo' style="width: 100%; position: relative;">
+            <img :src="goodsDetail.cover" style="width: 100%; height: auto; ">
+            <div class="flex-row" style="width: 100%; height: 100%; align-items: center; background-color: transparent; z-index: 80; position: absolute; top: 0; right: 0;">
+                <img src="../../image/video.png" style="width: 3rem; height: 3rem; margin: auto;">
+            </div>
+        </div>
+
+        <div class="yanjian" style="margin: 1.31rem 0 0 0.87rem;" v-if="goodsDetail.isStrictCheck == 1">
+            官方严检
+        </div>
+
+        <div class="flex-row base-padding" style="align-items: center; margin-top: 1.31rem;">
+            <span v-if='goodsDetail.tradeType == 1' style="font-size: 0.87rem; font-weight: bold; color: var(--theme-black);">月租</span>
+            <span style="font-size: 1.58rem; font-weight: bold; color: #FF4081; " v-text=" '￥' + goodsDetail.price"></span>
+            <span style="font-size: 1.1rem; color: var(--theme-grey); margin-left: 0.5rem; text-decoration: line-through; " v-text=" '￥' + goodsDetail.orgPrice" v-if='goodsDetail.tradeType == 2'></span>
+            <div class="hands-bg" style="margin-left: 1.5rem; font-size: 0.6rem; " v-if='goodsDetail.isFirstHand == 0'>二手乐器</div>
+            <div class="hands-bg" style="margin-left: 1.5rem; font-size: 0.6rem; " v-if='goodsDetail.isFirstHand == 1'>一手乐器</div>
+        </div>
+        <div class="flex-row base-padding" v-if='goodsDetail.tradeType == 1' style="font-size: 0.78rem; color: var(--theme-grey); ">
+            <span>押金:</span>
+            <span style="margin-left: 0.25rem;">￥</span>
+            <span v-text='goodsDetail.deposit'></span>
+            <span style="margin-left: 20%; ">原价:</span>
+            <span style="margin-left: 0.25rem;">￥</span>
+            <span v-text='goodsDetail.orgPrice'></span>
+        </div>
+        <div class="flex-row base-padding" v-if='goodsDetail.tradeType == 1' style="margin-top: 0.6rem; font-size: 0.78rem; color: var(--theme-grey); ">
+            <span>租期:</span>
+            <span style="margin-left: 0.25rem;">&nbsp;</span>
+            <span v-text='goodsDetail.rentTime' style=""></span>
+            <span>个月起租</span>
+        </div>
+
+        <!-- 标题 -->
+        <div class="flex-row base-padding" style="margin-top: 0.87rem; ">
+            <span style='font-size: 0.87rem; ' v-text='goodsDetail.title'></span>
+        </div>
+        <!-- <div class="flex-col" v-if='goodsDetail.video != undefined'>
+        <img :src="goodsDetail.cover" style="width: 100%; height: auto; margin-top: 0.5rem;">
+    </div> -->
+
+        <!-- 图片列表 -->
+        <div class="flex-col base-padding" v-for="(item,index) in goodsDetail.imageList">
+            <img :src="item" style="width: 100%; height: auto; margin-top: 0.5rem;">
+        </div>
+        <div class="base-padding flex-row" style="justify-content: flex-end; align-items: center; font-size: 0.7rem; color: var(--theme-grey); margin: 0.65rem 0;">
+            <span v-text="goodsDetail.commentNum + '人想要&sdot;'"></span>
+            <span style="margin-left: 0.15rem;" v-text=" goodsDetail.clickNum + '次浏览'"></span>
+            <!-- <img src="../../image/share.png" style="width: 0.75rem; height: 0.75rem; margin-left: 1rem; "> -->
+        </div>
+        <div class="grey-line" style="height: 0.5rem;"></div>
+
+        <div class="base-padding" v-text="'互动留言&middot;' + goodsDetail.commentNum" style='font-size: 0.8rem; font-weight: bold; margin: 0.5rem 0;'></div>
+        <div class="grey-line"></div>
+
+        <!-- 评论输入 -->
+        <div class="flex-row base-padding" style="align-items: center; margin: 0.5rem 0 1rem; align-items: center;">
+            <img src="../../image/user-photo.png" style="width: 2rem; height: 2rem; border-radius: 50%; ">
+            <div class="flex-row comment-line" style="flex: 1; margin-left: 0.5rem; height: 1.75rem; ">
+                <input type="text" class="" v-model='level1Comment' style="flex: 1; height: 100%; ">
+                <div class="comment-btn" @click='addLevel1Comment' style="font-size:0.78rem">
+                    留言
+                </div>
+            </div>
+        </div>
+
+        <!-- 评论列表 -->
+        <div class="" style="margin: 0.7rem 0; font-size: 0.7rem; " v-for='(item, index) in commentList'>
+            <!-- 用户头像、昵称、时间 -->
+            <div class="flex-row base-padding" style="align-items: center; margin-top: 1.3rem;">
+                <img :src="item.commentator.image" style="width: 2rem; height: 2rem; border-radius: 50%; ">
+                <div class="flex-col" style="margin-left: 0.5rem; ">
+                    <span style="font-size: 0.7rem; " v-text='item.commentator.nickName'></span>
+                    <span style="font-size: 0.6rem; color: var(--theme-grey); " v-text='getFormatTime(item.createTime)'></span>
+                </div>
+                <div class="" style="flex: 1;"></div>
+                <div class="flex-row" style="color: var(--theme-grey); ">
+                    <span v-text='item.likeNum'></span>
+                    <img src="../../image/like.png" style="width: 1rem; height: 1rem; margin-left: 0.15rem;">
+                </div>
+            </div>
+            <!-- 评论内容 -->
+            <div class="flex-row" style="margin-top: 0.5rem; padding-left: 3.2rem;">
+                <span style="" v-text='item.content' @click='showLevel2Input(item)'></span>
+            </div>
+            <!-- 2级评论内容 -->
+            <div class="flex-row" style="margin-top: 0.5rem; padding: 0 0.5rem 0 3rem;"
+                v-for='(subItem, subIndex) in item.level2CommentList' @click='gotoLevel2(subItem)'>
+                <div class="base-padding flex-row" style="width: 100%; align-items: center; background-color: var(--theme-light-grey); ">
+                    <!-- 作者 -->
+                    <div v-if='subItem.commentator.id == goodsDetail.sellerId'
+                        style="padding: 0.25rem 0; color: #1094DD; ">
+                        <span style="font-weight: bold;" v-text='subItem.commentator.nickName'></span>
+                        <span>(作者):</span>
+                    </div>
+                    <div v-if='subItem.commentator.id != goodsDetail.sellerId'
+                        style="padding: 0.25rem 0; color: var(--theme-grey); ">
+                        <span style="font-weight: bold; color: var(--theme-black); " v-text='subItem.commentator.nickName'></span>
+                        <span>:</span>
+                    </div>
+                    <!-- 内容 -->
+                    <span v-text='subItem.content' style="margin-left: 0.15rem;"></span>
+                </div>
+            </div>
+            <div v-if='item.level2CommentList.length > 1' class="flex-row" style="margin-top: 0.5rem; padding: 0 0.5rem 0 3rem; color: #1094DD;">
+                <span style="font-weight: bold; ">查看</span>
+                <span v-text='item.level2CommentList.length'></span>
+                <span style="font-weight: bold; ">条回复&nbsp;&gt;</span>
+            </div>
+        </div>
+        <div class="grey-line"></div>
+
+        <div class="" @click='gotoLevel1' style="text-align: center; font-size: 0.8rem; padding: 1rem 0.5rem;">
+            查看更多评论
+        </div>
+
+        <!-- 占位底部按钮栏高度 -->
+        <div class="" style="height: 2.5rem;"></div>
+
+        <!-- 赞、收藏、聊一聊、马上买 -->
+        <div class="flex-row base-padding" v-if='rentTimeDialogVisible == false' style="height: 2.5rem; position: fixed; left: 0; bottom: 0; background-color: white; border-top: 1px solid var(--theme-light-grey);">
+            <div class="flex-row" style="font-size: 0.7rem; width: 40%; justify-content: space-around; align-items: center; color: var(--theme-grey); ">
+                <div class="flex-row">
+                    <img v-if='goodsDetail.isLiked == 0' src="../../image/like.png" @click='addLike(goodsDetail)' style='width: 1.1rem; height: 1.1rem; '>
+                    <img v-if='goodsDetail.isLiked== 1' src="../../image/like-focus.png" @click='delectLike(goodsDetail)' style='width: 1.1rem; height: 1.1rem; '>
+                    <!-- <img src="../../image/like.png" style='width: 1.1rem; height: 1.1rem; ' > -->
+                    <span style="margin-left: 0.15rem;">超赞</span>
+                </div>
+                <div class="flex-row">
+                    <img v-if='goodsDetail.isCollected==0' src="../../image/collect.png" @click='addCollect(goodsDetail)' style='width: 1.1rem; height: 1.1rem; '>
+                    <img v-if='goodsDetail.isCollected==1' src="../../image/collect-focus.png" @click='delectCollect(goodsDetail)' style='width: 1.1rem; height: 1.1rem; '>
+                    <!-- <img src="../../image/collect.png" style='width: 1.1rem; height: 1.1rem; ' > -->
+
+                    <span style="margin-left: 0.15rem; margin-right: 0.25rem;">收藏</span>
+                </div>
+            </div>
+            <div class="flex-row" style="font-size: 0.7rem; width: 60%; align-items: center; justify-content: flex-end; ">
+                <div class="btn-bg" style="background-color: #FF9800; " @click="chat">
+                    聊一聊
+                </div>
+                <div class="btn-bg" style="background-color: #E4007F; margin-left: 0.5rem; " @click="placeOrders" v-if='goodsDetail.tradeType == 2'>
+                    马上买
+                </div>
+                <div class="btn-bg" style="background-color: #E4007F; margin-left: 0.5rem; " @click="rentTimeOption" v-if='goodsDetail.tradeType == 1'>
+                    马上租
+                </div>
+            </div>
+        </div>
+
+        <!-- 发送2级评论 -->
+        <!-- <div class="flex-row" style="background-color: white; align-items: center; position: fixed; bottom: 0; left: 0;"
+        v-show='level2InputVisible'>
+        <input type="text" id='level2Input' v-model='level2Comment' class="input-style2" style="width: 90%; ">
+        <div @click='addLevel2Comment' style="width: 4rem; height: 1.3rem;border-radius: 0.75rem; background-color: #E4007F; color:#FFFFFF;font-size: 0.8rem; text-align:center;line-height: 1.3rem;">
+            发送
+        </div>
+    </div> -->
+
+        <!-- 租期弹框 -->
+        <div class="base-padding" v-if='rentTimeDialogVisible == true' style="width: 100%; height: 8.5rem; background-color: white; position: fixed; bottom: 0; left: 0;">
+            <div class="grey-line"></div>
+            <div class="" style="margin: 0.65rem 0; position: relative; color: var(--theme-black); font-size: 0.87rem; font-weight: bold;">
+                <span>选择租期</span>
+                <i class="aui-iconfont aui-icon-close" @click='rentTimeDialogVisible = false' style="font-size: 1rem; position: absolute; top: 0px; right: 0rem;"></i>
+            </div>
+            <div class="flex-row">
+                <div class="rent-time-btn" @click='rentTimeClick(0)' v-bind:class='{"rent-active": selectedRentIndex == 0}'>6个月</div>
+                <div class="rent-time-btn" @click='rentTimeClick(1)' v-bind:class='{"rent-active": selectedRentIndex == 1}' style="margin-left: 1.5rem; ">12个月</div>
+            </div>
+            <div class="confirm-btn" style="margin: 2rem auto 0;" @click='placeOrders'>
+                确定
+            </div>
+
+        </div>
+
+    </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        vm.goodsId= params.goodsId;
+        // vm.goodsId= 46;
+        if (params.title) {
+            vm.title = params.title;
+        }
+
+        vm.initData();
+    };
+
+    function addLevel2CommentFunc(content) {
+        vm.addLevel2Comment(content);
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+            goodsId: 0,
+            goodsDetail: {},
+            rentTimeDialogVisible: false,
+            selectedRentIndex: 0,
+            buyerRentTime: 6,
+            level1Comment: '',
+            level2Comment: '',
+            commentContent: '',
+            level2InputVisible: false,
+            commentList: [],
+            commentPage:{
+              current: 1,
+              size: 5,
+              pages: 0,
+              total: 0
+            },
+            selectedComment: {},
+        },
+        methods: {
+            showShareOption() {
+                api.openFrame({
+                    name: 'share_frm',
+                    url: '../share/share_frm.html',
+                    bgColor: 'rgba(0, 0, 0, 0.7)',
+                    pageParam: {
+                        title: this.goodsDetail.title,
+                        description: this.goodsDetail.title,
+                        imgUrl: this.goodsDetail.cover,
+                        contentUrl: 'http://120.77.213.175:8090/#/blog?blogId=107'
+                    },
+                    reload: true
+                });
+            },
+            playVideo() {
+                var title = this.goodsDetail.title.length > 10 ? this.goodsDetail.title.substring(0, 10) : this.goodsDetail.title;
+                api.openWin({
+                    name: 'player',
+                    url: '../player/player.html',
+                    pageParam: {
+                        // videoUrl: 'http://7o50kb.com2.z0.glb.qiniucdn.com/c1.1.mp4',
+                        videoUrl: this.goodsDetail.video,
+                        videoTitle: title
+                    },
+                    slidBackEnabled: true
+                });
+            },
+            gotoLevel2(item) {
+                console.log(JSON.stringify(item));
+                api.openWin({
+                    name: 'level2_comment',
+                    url: '../comment/level2_comment.html',
+                    pageParam: {
+                        targetComment: item,
+                        topicId: this.goodsId,
+                        topicType: 2,
+                        topicAuthorId: this.goodsDetail.sellerId
+                    }
+                });
+            },
+            gotoLevel1() {
+                api.openWin({
+                    name: 'level1_comment',
+                    url: '../comment/level1_comment.html',
+                    pageParam: {
+                        topicId: this.goodsId,
+                        topicType: 2,
+                        authorId: this.goodsDetail.sellerId
+                    }
+                });
+            },
+            showLevel2Input(item) {
+                this.selectedComment = item;
+                api.openFrame({
+                    name: 'comment_input_line',
+                    url: '../comment/comment_input_line.html',
+                    bgColor: 'rgba(0, 0, 0, 0.7)',
+                    pageParam: {
+                        ordersId: item.id,
+                        prevPage: 'goods_detail'
+                    },
+                    reload: true
+                });
+            },
+            getFormatTime(time) {
+                var startDate = time.replace(new RegExp("-","gm"),"/");
+                var startDateM = (new Date(startDate)).getTime(); //得到毫秒数
+                return timeDiff(startDateM);
+            },
+            addLevel1Comment() {
+                var that = this;
+                var reg = /^[\u4E00-\u9FA5A-Za-z0-9_]+$/
+                if(!reg.test(that.level1Comment)){
+                  api.toast({
+                      msg: '评论内容不能为空',
+                      location: 'middle'
+                  });
+                }else{
+                  var params = {
+                      topicId: that.goodsId,
+                      topicType: 2,// 1博客，2商品
+                      level: 1,// 第一级评论
+                      content: that.level1Comment
+                  }
+                  ajaxPost('/comment/add', params, function(ret,arr){
+                    console.log(JSON.stringify(ret));
+                    if(ret){
+                          if(ret.returnCode == '1'){
+                              that.level1Comment = '';
+                              api.toast({
+                                  msg: '评论成功',
+                                  location: 'middle'
+                              });
+                              that.getCommentList();
+                          } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                          }
+                    } else {
+                      api.toast({
+                          msg: JSON.stringify(err),
+                          location: 'middle'
+                      });
+                    }
+                  })
+                }
+            },
+            addLevel2Comment(content) {
+                var that = this;
+                var params = {
+                    topicId: that.goodsId,
+                    topicType: 2,// 1博客，2商品
+                    level: 2,// 第2级评论
+                    content: content,
+                    targetCommentId: that.selectedComment.id
+                }
+                ajaxPost('/comment/add', params, function(ret,arr){
+                  console.log(JSON.stringify(ret));
+                  if(ret){
+                        if (ret.returnCode == '1') {
+                            api.toast({
+                                msg: '评论成功',
+                                location: 'middle'
+                            });
+                            that.getCommentList();
+                        } else {
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  } else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+            getCommentList() {
+                var that = this;
+                var params = {
+                    queryParams: {
+                        topicId: that.goodsId,
+                        topicType: 2
+                    },
+                    page: that.commentPage
+                }
+                console.log('params ' + JSON.stringify(params));
+                ajaxPost('/comment/getList', params, function(ret,arr){
+                  console.log('========' + JSON.stringify(ret));
+                  if(ret){
+                        if (ret.returnCode == '1') {
+                            that.commentList = ret.data.list;
+                        } else {
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  } else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+            rentTimeClick(index) {
+                this.selectedRentIndex = index;
+                if (index == 0) {
+                    this.buyerRentTime = 6;
+                } else if (index == 1) {
+                    this.buyerRentTime = 12;
+                }
+            },
+            rentTimeOption() {
+                this.rentTimeDialogVisible = true;
+            },
+            placeOrders(){
+              // 未登录，跳转登录
+              if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                  api.openWin({
+                      name: 'phone_login1',
+                      url: '../user/phone_login1.html',
+                      slidBackEnabled: true
+                  });
+                  return;
+              }
+              console.log(JSON.stringify(this.goodsDetail));
+              api.openWin({
+                  name: 'place_orders',
+                  url: '../orders/place_orders.html',
+                  pageParam: {
+                      goodsDetail: this.goodsDetail,
+                      buyerRentTime: this.buyerRentTime
+                  },
+                  reload: true
+              });
+          },
+            initData() {
+                this.getGoods();
+                this.getCommentList();
+            },
+            getGoods(){
+                var that = this;
+                console.log(JSON.stringify(that.goodsId));
+                ajaxPost('/goods/get', that.goodsId + '', function(ret, err) {
+                    console.log(JSON.stringify(ret.data));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.goodsDetail = ret.data;
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            chat(){
+                if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                    api.openWin({
+                        name: 'phone_login1',
+                        url: '../user/phone_login1.html',
+                        slidBackEnabled: true
+                    });
+                    return;
+                }
+
+                if ($api.getStorage('userId') == this.goodsDetail.sellerId) {
+                    api.toast({
+                        msg: '不能给自己发消息',
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                    return;
+                }
+
+                api.openWin({
+                    name: 'chat_win',
+                    url: './chat_win.html',
+                    pageParam: {
+                        targetId: this.goodsDetail.sellerId,
+                        goodsDetail: this.goodsDetail,
+                        title: this.goodsDetail.seller.nickName
+                    }
+                });
+            },
+            // 点击点赞
+            addLike(item){
+                if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                    api.openWin({
+                        name: 'phone_login1',
+                        url: '../user/phone_login1.html',
+                        slidBackEnabled: true
+                    });
+                    return;
+                }
+
+              var that = this;
+              var params={
+                    objId: item.id,
+                     objType: 2
+                  };
+              ajaxPost('/likes/add',params,function(ret,err){
+                console.log(JSON.stringify(ret));
+                if(item.isLiked==0){
+                  that.$set(that.goodsDetail,'isLiked',1)
+                }else{
+                  that.$set(that.goodsDetail,'isLiked',0)
+                }
+              })
+            },
+            // 取消点赞
+            delectLike(item){
+              var that = this;
+              var params={
+                    objId: item.id,
+                     objType: 2
+                  };
+              ajaxPost('/likes/delete',params,function(ret,err){
+                console.log(JSON.stringify(ret));
+                if(item.isLiked==0){
+                  that.$set(that.goodsDetail,'isLiked',1)
+                }else{
+                  that.$set(that.goodsDetail,'isLiked',0)
+                }
+              })
+            },
+            // 点击收藏
+            addCollect(item){
+                if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                    api.openWin({
+                        name: 'phone_login1',
+                        url: '../user/phone_login1.html',
+                        slidBackEnabled: true
+                    });
+                    return;
+                }
+
+              var that = this;
+              var params={
+                    objId: item.id,
+                     objType: 2
+                  };
+              ajaxPost('/collections/add',params,function(ret,err){
+                console.log(JSON.stringify(ret));
+                if(item.isCollected==0 || item.isCollected == undefined){
+                  that.$set(that.goodsDetail,'isCollected',1)
+                }else{
+                  that.$set(that.goodsDetail,'isCollected',0)
+                }
+              })
+            },
+            // 取消收藏
+            delectCollect(item){
+              var that = this;
+              var params={
+                    objId: item.id,
+                     objType: 2
+                  };
+              ajaxPost('/collections/delete',params,function(ret,err){
+                console.log(JSON.stringify(ret));
+                if(item.isCollected==0 || item.isCollected == undefined){
+                  that.$set(that.goodsDetail,'isCollected',1)
+                }else{
+                  that.$set(that.goodsDetail,'isCollected',0)
+                }
+              })
+            },
+
+        }
+    })
+
+</script>
+
+</html>

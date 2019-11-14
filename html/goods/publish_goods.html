@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        .div{
+            background-color: white;
+        }
+        .publish-img{
+            width:4.2rem;
+            height:4.2rem;
+            padding: 1px;
+            margin: 0.25rem 2px 0;
+            background-color: var(--theme-light-grey);
+            position: relative;
+        }
+        .aui-tab-item {
+            padding: 0 0.5rem;
+            font-size: 0.78rem;
+        }
+        input[type=number] {
+            color: var(--theme-grey);
+            background:transparent;
+            border: none;
+        }
+        input[type=number]:focus {
+            color: var(--theme-grey);
+            background:transparent;
+            outline: none;
+            border-color: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header id='header' class="aui-bar aui-bar-nav theme-bg header-fix" >
+            <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+            <div class="aui-title" style="display: flex; ">
+                <div style="margin: 0 auto; display: flex;">
+                    <div style="" v-text='title'></div>
+                </div>
+            </div>
+            <a class="aui-pull-right aui-btn" >
+                <div class="follow-btn" style="margin-left:1rem" @click='uploadMedia'>
+                    发布
+                </div>
+            </a>
+        </header>
+        <!--高度至少1px才能有效偏移-->
+        <div id='first-el' style="height: 1px; "></div>
+
+        <!-- 描述 -->
+        <div class="" style="margin:1rem 1rem 0 1rem;padding:0 0 1rem 0">
+            <textarea placeholder="在这里详细描述一下宝贝的转手原因、入手渠道、规格尺寸、新旧程度和使用感受吧~"
+                v-model='goodsTitle'
+                style="wrap:virtual; color:var(--theme-black); font-size:0.78rem;height:9rem;">
+            </textarea>
+        </div>
+
+        <!-- 图片 -->
+        <div class="flex-row " style="width: 100%; flex-wrap: wrap; padding-left:0.74rem; background-color: white;">
+            <div class="publish-img" v-for='(item, index) in selectedMediaList'
+                v-bind:style="{width: imgWidth, height: imgWidth} ">
+                <img :src="item.thumbPath" style="width: 100%; max-height: 100%;">
+                <div class="flex-row" v-if='item.mediaType == "video" || item.mediaType == "Video"'
+                    style="width: 100%; height: 100%; z-index: 80; align-items: center; background-color: transparent; position: absolute; top: 0; right: 0;">
+                    <img src="../../image/video.png" style="width: 2rem; height: 2rem; margin: auto;">
+                </div>
+            </div>
+            <div class="publish-img flex-row" style="align-items: center; "
+                @click='gotoSelectMedia'
+                v-bind:style="{width: imgWidth, height: imgWidth} ">
+                <img src="../../image/plus-grey.png" style="width: 1.5rem; height: 1.5rem; margin: auto;">
+            </div>
+        </div>
+
+        <!-- 城市 -->
+        <div class="flex-row base-padding" @click='showCityOption' style="align-items: center; font-size: 0.6rem; margin-top: 0.78rem; ">
+            <img src="../../image/area.png" style='width: 0.65rem; height: 0.65rem; margin-left: 0.25rem;' >
+            <div class="" style="margin-left: 0.25rem; " v-if='location != undefined'
+                v-text='provinceName + "&sdot;" + cityName'>
+            </div>
+        </div>
+        <!-- <div class="grey-line" style="height: 0.5rem; margin-top: 0.78rem; "></div> -->
+
+        <div class="aui-tab base-padding" style="width: 100%; margin-top: 1rem; font-weight: bold;">
+            <div class="aui-tab-item" @click='tabClick(0)'
+                v-bind:class='{"aui-active": selectedTabIndex == 0}'>出租</div>
+            <div class="aui-tab-item" @click='tabClick(1)'
+                v-bind:class='{"aui-active": selectedTabIndex == 1}'>转卖</div>
+        </div>
+
+        <!-- 出租 -->
+        <div class="" style="width: 100%; " v-if='selectedTabIndex == 0'>
+            <div class="flex-row base-padding" style="height: 3rem; font-size: 0.78rem; align-items: center; color: var(--theme-grey); ">
+                <span style="color: var(--theme-black); ">租金</span>
+                <span style="margin-left: 0.87rem; ">￥</span>
+                <input type="number" v-model='price' placeholder='0.00' style="width: 50%; ">
+            </div>
+            <div class="grey-line"></div>
+
+            <div class="flex-row base-padding" style="height: 3rem; font-size: 0.78rem; align-items: center; color: var(--theme-grey); ">
+                <span style="color: var(--theme-black); ">押金</span>
+                <span style="margin-left: 0.87rem; ">￥</span>
+                <input type="number" v-model='deposit' placeholder='0.00' style="width: 50%; ">
+            </div>
+            <div class="grey-line"></div>
+
+            <div class="flex-row base-padding" style="height: 3rem; font-size: 0.78rem; align-items: center; color: var(--theme-grey); ">
+                <span style="color: var(--theme-black); ">原价</span>
+                <span style="margin-left: 0.87rem; ">￥</span>
+                <input type="number" v-model='orgPrice' placeholder='0.00' style="width: 50%; ">
+            </div>
+            <div class="grey-line"></div>
+
+            <div class="flex-row base-padding" style="height: 3rem; font-size: 0.78rem; align-items: center; color: var(--theme-grey); ">
+                <span style="color: var(--theme-black); ">起租期</span>
+                <span style="margin-left: 0.87rem; "></span>
+                <input type="number" v-model='rentTime' placeholder='0' style="width: 1.25rem;">
+                <span style=" ">个月</span>
+            </div>
+            <div class="grey-line"></div>
+        </div>
+
+        <!-- 转卖 -->
+        <div class="" style="width: 100%; " v-if='selectedTabIndex == 1'>
+            <div class="flex-row base-padding" style="height: 3rem; font-size: 0.78rem; align-items: center; color: var(--theme-grey); ">
+                <span style="color: var(--theme-black); ">价格</span>
+                <span style="margin-left: 0.87rem; ">￥</span>
+                <input type="number" v-model='price' placeholder='0.00' style="width: 50%; ">
+            </div>
+            <div class="grey-line"></div>
+
+            <div class="flex-row base-padding" style="height: 3rem; font-size: 0.78rem; align-items: center; color: var(--theme-grey); ">
+                <span style="color: var(--theme-black); ">原价</span>
+                <span style="margin-left: 0.87rem; ">￥</span>
+                <input type="number" v-model='orgPrice' placeholder='0.00' style="width: 50%; ">
+            </div>
+            <div class="grey-line"></div>
+        </div>
+
+        <!-- 是否一手 -->
+        <div class='flex-row base-padding' style="height: 3rem; align-items: center; color: var(--theme-black); ">原始购入渠道</div>
+        <div class="flex-row base-padding" style="align-items: center; color: var(--theme-grey); padding-bottom: 2rem;">
+            <input type="radio" name="isFirstHand" class="aui-radio" id='pay'
+                v-model="isFirstHand" value='1' >
+            <span style='margin-left: 0.5rem;'>一手购入</span>
+            <input type="radio" name="isFirstHand" class="aui-radio" id='pay'
+                v-model="isFirstHand" value='0' style='margin-left: 20%;' >
+            <span style='margin-left: 0.5rem;'>二手购入</span>
+        </div>
+
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var UIAlbumBrowser;
+    var aliOSS;
+    var txShortVideo;
+
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+
+        UIAlbumBrowser = api.require('UIAlbumBrowser');
+        aliOSS = api.require("aliOSS");
+        txShortVideo = api.require('txShortVideo');
+
+        vm.initData();
+
+        api.addEventListener({
+            name:'viewappear'
+        }, function(ret, err){
+           // console.log('viewappear');
+           // 界面恢复后，刷新数据
+           vm.initData();
+        });
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '发布',
+            location: {
+                province: '',
+                city: ''
+            },
+            provinceName: '',
+            districtCode: '',
+            cityName: '',
+            tradeType: 1,
+            selectedTabIndex: 0,
+            price: '',
+            orgPrice: '',
+            deposit: '',
+            rentTime: 6,
+            isFirstHand: 1,
+            imgWidth: '0px',
+            goodsTitle: '',
+            selectedMediaList: [],
+            successImageList: [],
+            imageNum: 0,
+            videoNum: 0,
+            hasVideo: false,
+            videoMediaItem: {},// 视频内容
+            successImageCount: 0,
+            successVideoCount: 0,
+            successVideoUrl: '',
+            coverPath: '',
+            videoCover: '',
+            videoId: '',
+            videoDuration: 0,
+        },
+        methods: {
+            tabClick(index) {
+                console.log('tabClick ' + index);
+                this.selectedTabIndex = index;
+                this.tradeType = index + 1;
+            },
+            showCityOption() {
+                var that = this;
+                console.log('showCityOption');
+                var UIActionSelector = api.require('UIActionSelector');
+                UIActionSelector.open({
+                    datas: 'widget://res/city.json',
+                    layout: {
+                        row: 5,
+                        col: 3,
+                        height: 30,
+                        size: 12,
+                        sizeActive: 14,
+                        rowSpacing: 5,
+                        colSpacing: 10,
+                        maskBg: 'rgba(0,0,0,0.2)',
+                        bg: '#fff',
+                        color: '#888',
+                        // colorActive: '#f00',
+                        colorActive: '#3AB2BF',
+                        // colorSelected: '#f00'
+                        colorSelected: '#3AB2BF'
+                    },
+                    animation: true,
+                    cancel: {
+                        text: '取消',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    ok: {
+                        text: '确定',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    title: {
+                        text: '请选择',
+                        size: 12,
+                        h: 44,
+                        bg: '#eee',
+                        color: '#888'
+                    }
+                    // fixedOn: api.frameName
+                }, function(ret, err) {
+                    if (ret) {
+                        console.log(JSON.stringify(ret));
+                        that.provinceName = ret.selectedInfo[0].name;
+                        that.cityName = ret.selectedInfo[1].name;
+                        that.districtCode = ret.selectedInfo[2].id;// 区行政编码
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
+                });
+            },
+            gotoSelectMedia() {
+                api.openWin({
+                    name: 'select_media',
+                    url: '../blog/select_media.html',
+                    pageParam: {
+                        publishType: 'goods',
+                        imageOnly: false,
+                        addMode: true
+                    },
+                    reload: false
+                });
+            },
+            initData() {
+                this.imgWidth = ((api.winWidth - 40) / 4) + 'px';
+
+                // 地理位置
+                if ($api.getStorage('location') != undefined) {
+                    this.location = $api.getStorage('location');
+                    this.cityName = this.location.city;
+                    this.districtCode = this.location.adCode;
+                    this.provinceName = this.location.province;
+                }
+
+                // 读取选择的图片视频
+                this.selectedMediaList = $api.getStorage('selectedMediaList');
+                if (this.selectedMediaList == undefined) {
+                    this.selectedMediaList = [];
+                }
+                // 图片数量计算
+                this.imageNum = 0;
+                for (var i = 0; i < this.selectedMediaList.length; i++) {
+                    var item = this.selectedMediaList[i];
+                    if (item.mediaType.toLowerCase() == 'image') {
+                        this.imageNum++;
+                    }
+                }
+
+                // 查看是否有视频，视频数量计算（只允许传1个视频）
+                this.hasVideo = false;
+                this.videoNum = 0;
+                for (var i = 0; i < this.selectedMediaList.length; i++) {
+                    var item = this.selectedMediaList[i];
+                    if (item.mediaType.toLowerCase() == 'video') {
+                        this.videoNum++;
+                        this.hasVideo = true;
+                        this.videoMediaItem = item;
+                        // 如果有视频，用视频图片作为封面
+                        this.coverPath = this.selectedMediaList[0].thumbPath;
+                    }
+                }
+            },
+            uploadMedia() {
+                // 检查输入参数
+                if (this.checkParams() == false) {
+                    return;
+                }
+                this.uploadVideo();
+                this.uploadImage();
+            },
+            uploadVideo() {
+                var that = this;
+                if (!that.hasVideo) {
+                    return;
+                }
+                that.successVideoCount = 0;
+                if (api.systemType == 'ios') {// ios要经过转换才能读取文件
+                    UIAlbumBrowser.transVideoPath({
+                        path: that.videoMediaItem.path
+                    }, function(ret, err) {
+                        if (ret.status == true) {
+                            that.videoMediaItem.path = ret.albumVideoPath;
+                            that.uploadSingleVideo(that.videoMediaItem);
+                        } else {
+                            api.toast({
+                                msg: '视频读取失败' + JSON.stringify(err),
+                                location: 'middle'
+                            });
+                        }
+                    });
+                } else {// android，直接上传
+                    that.uploadSingleVideo(that.videoMediaItem);
+                }
+            },
+            uploadSingleVideo(videoItem) {
+                var that = this;
+                api.showProgress({
+                    title: '发布中...'
+                });
+                txShortVideo.setLicence({
+                    licenceURL : txVideoLicenceUrl,
+                    licenceKey : txVideoLicenceKey
+                }, function(licRet, licErr){
+                    console.log(JSON.stringify(licRet) + " " + JSON.stringify(licErr));
+                    ajaxPost('/txVideo/getSign', {}, function(ret, err) {
+                        console.log(JSON.stringify(ret));
+                        if (ret) {
+                            if (ret.returnCode == '1') {
+                                var sign = ret.data;
+                                var srcFile = videoItem.path;
+                                var coverPath = videoItem.thumbPath;
+                                // console.log('sign ' + sign + ' srcFile ' + srcFile);
+                                console.log('srcFile ' + srcFile);
+                                txShortVideo.uploadLocalVideo({
+                                    signature: sign,
+                                    videoPath: srcFile,
+                                    coverPath: coverPath
+                                }, function(ret, err) {
+                                    console.log('txVideo ret ' + JSON.stringify(ret));
+                                    if (ret) {
+                                        if (ret.videoId) {
+                                            console.log(JSON.stringify(ret));
+                                            that.successVideoCount++;
+                                            that.successVideoUrl = ret.videoURL;
+                                            that.videoCover = ret.coverURL;
+                                            console.log('videoCover ' + that.videoCover);
+                                            that.videoId = ret.videoId;
+                                            // that.videoDuration = parseInt(ret.duration / 1000);
+                                            if (that.mediaAllUploaded()) {
+                                                that.publishGoods();
+                                            }
+                                        }
+                                    }
+                                    if (err) {
+                                        console.log(JSON.stringify(err));
+                                    }
+                                });
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    location: 'middle'
+                                });
+                                api.hideProgress();
+                            }
+                        } else {
+                            api.toast({
+                                msg: JSON.stringify(err),
+                                location: 'middle'
+                            });
+                            api.hideProgress();
+                        }
+                    })
+                });
+            },
+            uploadImage() {
+                var that = this;
+                that.successImageCount = 0;
+                that.successImageList = [];
+                api.showProgress({
+                    title: '发布中...'
+                });
+                aliOSS.init({
+                        endpoint: aliEndPoint,
+                        signUrl: hostIp + "/aliOss/getSign",
+                        bucketName: aliBucketName
+                    },
+                    function(ret, err) {
+                        console.log(JSON.stringify(ret));
+                        if (ret) {
+                            console.log(JSON.stringify(that.selectedMediaList));
+                            for (var i = 0; i < that.selectedMediaList.length; i++) {
+                                var item = that.selectedMediaList[i];
+                                if (item.mediaType.toLowerCase() != 'image') {// 视频，另外处理
+                                    // console.log('continue');
+                                    continue;
+                                }
+                                // ios要经过转换才能读取文件，needNoTranspath表示是FNPhotograph获取的图片，不需要转换
+                                if (api.systemType == 'ios'
+                                    && (item.needNoTranspath == false || item.needNoTranspath == undefined)) {
+                                    UIAlbumBrowser.transPath({
+                                        path: item.path
+                                    }, function(ret, err) {
+                                        if (ret) {
+                                            // 上传
+                                            var srcFile = ret.path;
+                                            var fileSuffix = srcFile.substring(srcFile.lastIndexOf('.'), srcFile.length);
+                                            // 上传后保存的文件名
+                                            var saveName = 'xiangla/goods/' + getTimeStr() + randomNum(1000, 9999) + fileSuffix;
+                                            // console.log('saveName ' + saveName);
+                                            that.uploadSingleImage(srcFile, saveName);
+                                        } else {
+                                            api.toast({
+                                                msg: 'transPath ' + JSON.stringify(err),
+                                                location: 'middle'
+                                            });
+                                            api.hideProgress();
+                                            return;
+                                        }
+                                    });
+                                } else {// android，直接压缩上传
+                                    // 上传
+                                    var srcFile = item.path;
+                                    var fileSuffix = srcFile.substring(srcFile.lastIndexOf('.'), srcFile.length);
+                                    // 上传后保存的文件名
+                                    var saveName = 'xiangla/goods/' + getTimeStr() + randomNum(1000, 9999) + fileSuffix;
+                                    // console.log('saveName ' + saveName);
+                                    that.uploadSingleImage(srcFile, saveName);
+                                }
+                            }
+                        }
+                    }
+                );
+            },
+            // srcFile：上传文件，saveName：上传后的文件名，不包括域名前缀
+            uploadSingleImage(srcFile, saveName) {
+                var that = this;
+                aliOSS.upload({
+                        file: srcFile,
+                        name: saveName
+                    },
+                    function(ret, err) {
+                        // console.log(JSON.stringify(ret));
+                        if (ret) {
+                            if (ret.oper == "progress") {
+
+                            } else if (ret.oper == "complete") {
+                                // 上传图片计数
+                                that.successImageCount++;
+                                that.successImageList.push(imageDomain + '/' + saveName + '?x-oss-process=style/width360');
+                                console.log('successNum ' + that.successImageCount + ' imageNum ' + that.imageNum);
+                                if (that.mediaAllUploaded()) {
+                                    api.hideProgress();
+                                    that.publishGoods();
+                                }
+                            }
+                        }
+                        if (err) {
+                            api.toast({
+                                msg: err.msg,
+                                location: 'middle'
+                            });
+                        }
+                    }
+                );
+            },
+            checkParams() {
+                var that = this;
+                // 输入检查
+                if (that.tradeType == 1) {// 出租
+                    if (that.title == '' || that.price == '' || that.deposit == ''
+                        || that.rentTime == '' || that.rentTime == 0) {
+                        api.toast({
+                            msg: '输入不能为空',
+                            location: 'middle'
+                        });
+                        return false;
+                    }
+                    that.price = Math.round(that.price * 100) / 100;
+                    that.deposit = Math.round(that.deposit * 100) / 100;
+                    that.rentTime = parseInt(that.rentTime);
+                    // console.log(that.price + ' ' + that.deposit + ' ' + that.rentTime);
+                    if (that.price == 0) {
+                        api.toast({
+                            msg: '租金必须大于0',
+                            location: 'middle'
+                        });
+                        return false;
+                    }
+                    if (that.deposit == 0) {
+                        api.toast({
+                            msg: '押金必须大于0',
+                            location: 'middle'
+                        });
+                        return false;
+                    }
+                    if (that.rentTime == 0) {
+                        api.toast({
+                            msg: '起租期必须大于0',
+                            location: 'middle'
+                        });
+                        return false;
+                    }
+                } else {// 出售
+                    if (that.title == '' || that.price == '' || that.orgPrice == '') {
+                        api.toast({
+                            msg: '输入不能为空',
+                            location: 'middle'
+                        });
+                        return false;
+                    }
+
+                    that.price = Math.round(that.price * 100) / 100;
+                    that.orgPrice = Math.round(that.orgPrice * 100) / 100;
+                    // console.log(that.price + ' ' + that.deposit + ' ' + that.rentTime);
+                    if (that.price == 0) {
+                        api.toast({
+                            msg: '价格必须大于0',
+                            location: 'middle'
+                        });
+                        return false;
+                    }
+                    if (that.orgPrice == 0) {
+                        api.toast({
+                            msg: '原价必须大于0',
+                            location: 'middle'
+                        });
+                        return false;
+                    }
+                }
+
+                return true;
+            },
+            mediaAllUploaded() {
+                var that = this;
+                if (that.successImageCount == that.imageNum && that.successVideoCount == that.videoNum) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            publishGoods() {
+                var that = this;
+                // 设置封面图片，不在一开始设置，是因为必须是上传后返回的地址
+                var coverUrl;
+                if (that.hasVideo) {
+                    coverUrl = that.videoCover;// 视频封面
+                } else {
+                    coverUrl = that.successImageList[0];
+                }
+
+                var params = {
+                    image: that.successImageList.join(','),
+                    videoId: that.videoId,
+                    districtCode: that.districtCode,
+                    cover: coverUrl,
+                    title: that.goodsTitle,
+                    price: that.price,
+                    orgPrice: that.orgPrice,
+                    rentTime: that.rentTime,
+                    deposit: that.deposit,
+                    tradeType: that.tradeType,
+                    isFirstHand: that.isFirstHand
+                };
+                console.log('params ' + JSON.stringify(params));
+                api.showProgress({
+                    title: '努力加载中...'
+                });
+                ajaxPost('/goods/add', params, function(ret, err) {
+                    api.hideProgress();
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            api.hideProgress();
+                            if (!that.hasVideo) {
+                                api.toast({
+                                    msg: '发布成功',
+                                    location: 'middle'
+                                });
+                            } else {
+                                api.toast({
+                                    msg: '视频审核中，请稍后查看',
+                                    location: 'middle'
+                                });
+                            }
+                            $api.rmStorage('selectedMediaList');
+                            setTimeout(function() {
+                                api.closeToWin({
+                                    name: 'root'
+                                });
+                            }, 500)
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                            api.hideProgress();
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                        api.hideProgress();
+                    }
+                })
+            },
+        }
+    })
+
+</script>
+
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>筛选</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        html, body{
+            width: 100%;
+    		height: 100%;
+			background: transparent;
+            display: flex;
+            flex-direction: column;
+		}
+        .btn {
+            width: 80%;
+            border-color: var(--theme-color);
+            height: 2rem;
+            line-height: 2rem;
+        }
+        .fill-btn {
+            width: 80%;
+            background-color: var(--theme-color);
+            height: 2rem;
+            line-height: 2rem;
+            color: white;
+        }
+        .valid-area {
+            width: 80%;
+            height: 50%;
+            background-color: white;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div id="app" class='flex-center' style='width: 100%; height: 100%; ' >
+    <div class="valid-area" >
+        <div class="flex-center size-common bold" style="margin-top: 1rem;">
+            筛选条件
+        </div>
+        <div class="flex-center" style='margin-top: 1rem; '  >
+            <div class="aui-btn aui-btn-outlined btn" @click='showAgeOption'>
+                年龄不限
+            </div>
+        </div>
+        <div class="flex-center" style='margin-top: 1rem; '  >
+            <div class="aui-btn aui-btn-outlined btn" @click='showHeightOption'>
+                身高不限
+            </div>
+        </div>
+        <div class="flex-center" style='margin-top: 1rem; '  >
+            <div class="aui-btn aui-btn-outlined btn" @click='showEduOption'>
+                学历不限
+            </div>
+        </div>
+        <div class="flex-center" style='margin-top: 1rem; '  >
+            <div class="aui-btn fill-btn" @click='saveOption'>
+                确定
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+        vm.initOptions();
+        //vm.showAgeOption();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            ageList: [],
+            heightList: [
+                {'name': '155以上'},
+                {'name': '160以上'},
+                {'name': '165以上'},
+                {'name': '170以上'},
+                {'name': '175以上'},
+                {'name': '180以上'}
+            ],
+            eduList: [
+                {'name': '大专及以上'},
+                {'name': '本科及以上'},
+                {'name': '硕士及以上'}
+            ],
+        },
+        methods: {
+            initOptions() {
+                // 年龄
+                var date = new Date();
+                var year = date.getFullYear() - 18;
+                var ageToList = [];
+                for (var i = 1970; i <= year; i++) {
+                    var item = {'name': i};
+                    ageToList.push(item);
+                }
+                for (var i = 1970; i <= year; i++) {
+                    var item = {
+                        'name': i,
+                        'sub': ageToList
+                    };
+                    this.ageList.push(item);
+                }
+            },
+            showAgeOption() {
+                var that = this;
+                var UIActionSelector = api.require('UIActionSelector');
+                UIActionSelector.open({
+                    datas: that.ageList,
+                    layout: {
+                        row: 5,
+                        col: 2,
+                        height: 30,
+                        size: 12,
+                        sizeActive: 14,
+                        rowSpacing: 5,
+                        colSpacing: 10,
+                        maskBg: 'rgba(0,0,0,0.2)',
+                        bg: '#FFFFFF',
+                        color: '#000000',
+                        //colorActive: '#f00',
+                        //colorSelected: '#000'
+                    },
+                    animation: true,
+                    cancel: {
+                        text: '不限',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    ok: {
+                        text: '确定',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    title: {
+                        text: '选择年龄',
+                        size: 12,
+                        h: 44,
+                        bg: '#eee',
+                        color: '#888'
+                    },
+                    fixedOn: api.frameName
+                }, function(ret, err) {
+                    if (ret) {
+                        console.log(JSON.stringify(ret));
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
+                });
+            },
+            showHeightOption() {
+                console.log('showHeightOption');
+                var that = this;
+                var UIActionSelector = api.require('UIActionSelector');
+                UIActionSelector.open({
+                    datas: that.heightList,
+                    layout: {
+                        row: 5,
+                        col: 1,
+                        height: 30,
+                        size: 12,
+                        sizeActive: 14,
+                        rowSpacing: 5,
+                        colSpacing: 10,
+                        maskBg: 'rgba(0,0,0,0.2)',
+                        bg: '#FFFFFF',
+                        color: '#000000',
+                        //colorActive: '#f00',
+                        //colorSelected: '#000'
+                    },
+                    animation: true,
+                    cancel: {
+                        text: '不限',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    ok: {
+                        text: '确定',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    title: {
+                        text: '选择年龄',
+                        size: 12,
+                        h: 44,
+                        bg: '#eee',
+                        color: '#888'
+                    },
+                    fixedOn: api.frameName
+                }, function(ret, err) {
+                    if (ret) {
+                        console.log(JSON.stringify(ret));
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
+                });
+            },
+            showEduOption() {
+                var that = this;
+                var UIActionSelector = api.require('UIActionSelector');
+                UIActionSelector.open({
+                    datas: that.eduList,
+                    layout: {
+                        row: 5,
+                        col: 1,
+                        height: 30,
+                        size: 12,
+                        sizeActive: 14,
+                        rowSpacing: 5,
+                        colSpacing: 10,
+                        maskBg: 'rgba(0,0,0,0.2)',
+                        bg: '#FFFFFF',
+                        color: '#000000',
+                        //colorActive: '#f00',
+                        //colorSelected: '#000'
+                    },
+                    animation: true,
+                    cancel: {
+                        text: '不限',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    ok: {
+                        text: '确定',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    title: {
+                        text: '选择年龄',
+                        size: 12,
+                        h: 44,
+                        bg: '#eee',
+                        color: '#888'
+                    },
+                    fixedOn: api.frameName
+                }, function(ret, err) {
+                    if (ret) {
+                        console.log(JSON.stringify(ret));
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
+                });
+            },
+            saveOption() {
+                api.closeFrame();
+            },
+
+        }
+    })
+
+</script>
+
+</html>

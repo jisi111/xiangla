@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>打开网页</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app" class="main-win" style="overflow: hidden;">
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack'></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="">{{title}}</div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <img style="width: 1rem; height: 1rem;" src="../../image/kefu.png">
+        </a>
+    </header>
+    <div id="content" class="flex-1">
+
+    </div>
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.openFrame();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '打开网页'
+        },
+        methods: {
+            openFrame() {
+                api.openFrame({
+                    name: 'remoteWeb',
+                    url: 'https://www.apicloud.com/',
+                    rect: {
+                        x: 0,
+                        y: $api.dom('header').offsetHeight,
+                        w: api.winWidth,
+                        h: $api.dom('#content').offsetHeight
+                    },
+                    useWKWebView: true,
+                    progress: {
+                        type: 'page'
+                    }
+                });
+
+            }
+
+
+        }
+    })
+
+</script>
+
+</html>

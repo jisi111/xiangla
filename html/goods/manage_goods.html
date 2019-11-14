@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+    .aui-tab-item {
+        padding: 0 0.74rem;
+        font-size: 0.70rem;
+    }
+    .aui-active {
+        font-weight: bold;
+    }
+    .manage_body{
+      padding-left: 0.65rem;
+      padding-right: 0.57rem;
+    }
+    .manage_goods{
+      border-bottom: 0.52rem solid #f7f7f7;
+      padding-top: 0.87rem;
+      padding-bottom: 0.52rem;
+      overflow: hidden;
+    }
+    .manage_goods>img{
+      float: left;
+      width: 5.2rem;
+      height: 5.2rem;
+      vertical-align: top;
+      margin-right: 0.43rem;
+      margin-bottom: 0.43rem;
+    }
+    .manage_goods>.aui-ellipsis-2{
+      float: left;
+      width: 11.09rem;
+      font-size: 0.7rem;
+      color: var(--theme-black);
+      height: 2.0rem;
+    }
+    .manage_goods>.price{
+      margin-top: 1.52rem;
+      font-size: 1.22rem;
+      color: #E51C23 ;
+    }
+    .manage_goods>.manage_situation{
+      width: 100%;
+      overflow: hidden;
+    }
+    .manage_situation .button{
+      font-size: 0.61rem;
+      padding: 0.2rem 1rem;
+      /*width: 5.0rem;
+      height: 1.31rem;*/
+      background-color:  #E51C23;
+      color: var(--theme-color);
+      float: left;
+      border-radius:0.43rem;
+    }
+    .manage_situation>span{
+      float: right;
+      color:  var(--theme-grey);
+      margin-left: 1.09rem;
+      text-align: center;
+    }
+    .manage_goods>.rent{
+    color:  var(--theme-black);
+    margin-top: 2.42rem;
+    font-size: 0.70rem;
+    }
+    .manage_goods>.rent>span{
+      margin-left: 0.35rem;
+      font-size: 1.22rem;
+      color: #E51C23 ;
+    }
+    .manage_goods>.cash{
+      font-size: 0.70rem;
+      color:  var(--theme-black);
+      float: left;
+    }
+    .manage_goods>.cash>span{
+      margin-left: 5px;
+    }
+    .manage_goods>.time{
+      float: right;
+      color:  var(--theme-black);
+    }
+    .manage_goods>.time>span{
+      margin-left: 5px
+    }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <!-- <img style="width: 1rem; height: 1rem;" src="../../image/share-grey.png"> -->
+        </a>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="manage_body">
+      <!-- 切换效果 -->
+      <div class='flex-row flex-between' id='topLine' style="margin-top:0px;">
+          <div class="aui-tab base-padding" style="width: 100%;  ">
+              <div class="aui-tab-item" @click='topClick(0)'
+                  v-bind:class='{"aui-active": selectedTabIndex == 0}'>全部</div>
+              <div class="aui-tab-item" @click='topClick(1)'
+                  v-bind:class='{"aui-active": selectedTabIndex == 1}'>已下架</div>
+          </div>
+      </div>
+
+
+      <div class="manage_goods"  v-for='(item,index) in manageList'>
+          <img :src="item.cover" >
+          <p class='aui-ellipsis-2' v-text='item.title'>日本原装进口kawai钢kup132用了1年多，平时保养维护到位，外观9.5成新</p>
+            <span class="price" v-if='item.tradeType==2'>￥<span v-text='item.price'>30000</span></span>
+          <p class="rent" v-if = 'item.tradeType==1' >月租￥<span v-text='item.deposit'>300</span></p>
+          <p class="cash" v-if = 'item.tradeType==1'>押金:<span v-text='item.price'>30000元</span></p>
+          <p class="time" v-if = 'item.tradeType==1'>租期: <span v-text='item.rentTime'></span>个月起租</p>
+          <div class="manage_situation">
+              <div></div>
+              <span class="button"  style="margin-left: 0rem;" v-if='item.saleStatus == 2 && item.tradeType == 2'>状态: 已售</span>
+              <span class="button" style='background-color:#0E90CC; margin-left:0rem;' v-if='item.saleStatus == 2 && item.tradeType == 1'>状态: 已租</span>
+
+            <span style="font-size:0.7rem;">编辑</span>
+            <span style="font-size:0.7rem;">|</span>
+            <span v-if='item.shelveStatus==1' @click ='downStatus(item,index)' style="font-size:0.7rem;">下架</span>
+            <span v-if='item.shelveStatus==2' @click ='upStatus(item,index)' style="font-size:0.7rem;">上架</span>
+          </div>
+      </div>
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        api.addEventListener({
+            name:'scrolltobottom',
+            extra:{
+                threshold: 0
+            }
+        }, function(ret, err){
+            console.log('scrolltobottom');
+            vm.getNextPage();
+        });
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '宝贝管理',
+            selectedTabIndex: 0,
+            page: {
+                current: 1,
+                size: 10,
+                pages: 0,
+                total: 0
+            },
+            queryParams: {
+              shelveStatus: 1
+            },
+            manageList:[],
+        },
+        methods: {
+            initData() {
+                this.queryParams = {};// 查询全部，不传参
+                this.getList()
+            },
+            topClick(index){
+              var that = this;
+              that.page.current = 1;
+              that.selectedTabIndex = index;
+              if (index == 0) {
+                that.queryParams = {};
+              } else {
+                that.queryParams = {
+                  shelveStatus: 2
+                };
+              }
+              that.getList();
+            },
+            getList() {
+                var that = this;
+                var params = {
+                    queryParams: that.queryParams,
+                    page: that.page
+                };
+                // console.log('params ' + JSON.stringify(params));
+                ajaxPost('/goods/getMyList', params, function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.page = ret.data.page;
+                            if (that.page.current == 1) {
+                                that.manageList = ret.data.list;
+                            } else {
+                                that.manageList.push.apply(that.manageList, ret.data.list);
+                                api.pageDown(function( ret, err ){});
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            getNextPage() {
+                if (this.page.current >= this.page.pages) {
+                    api.toast({
+                        msg: '没有更多内容',
+                        location: 'middle'
+                    });
+                    return;
+                }
+                this.page.current++;
+                this.getList();
+            },
+            upStatus(item,index){
+                var that = this;
+                var params = {
+                  id: item.id,
+                  shelveStatus: 1
+                }
+                ajaxPost('/goods/shelve',params,function(ret,err){
+                      console.log(JSON.stringify(ret));
+                      if(ret){
+                          if(ret.returnCode==1){
+                              if(item.shelveStatus==1){
+                                that.$set(that.manageList[index],'shelveStatus',2);
+                              }else{
+                                that.$set(that.manageList[index],'shelveStatus',1);
+                              }
+                              if (that.selectedTabIndex == 1) {
+                                that.manageList.splice(index, 1);
+                              }
+                          }else{
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                          }
+                      }else{
+                        api.toast({
+                          msg:JSON.stringify(err),
+                          location:'middle'
+                        });
+                      }
+                })
+            },
+            downStatus(item,index){
+              var that = this;
+              var params = {
+                id:item.id,
+                shelveStatus: 2
+              }
+              ajaxPost('/goods/shelve',params,function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if(ret){
+                        if(ret.returnCode==1){
+                            if(item.shelveStatus==1){
+                              that.$set(that.manageList[index],'shelveStatus',2);
+                            }else{
+                              that.$set(that.manageList[index],'shelveStatus',1);
+                            }
+                            if (that.selectedTabIndex == 1) {
+                              that.manageList.splice(index, 1);
+                            }
+                        }else{
+                          api.toast({
+                            msg:ret.returnCode,
+                            location:'middle'
+                          });
+                        }
+                    }else{
+                      api.toast({
+                        msg:JSON.stringify(err),
+                        location:'middle'
+                      });
+                    }
+              })
+            },
+        }
+    })
+
+</script>
+
+</html>

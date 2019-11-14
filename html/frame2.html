@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板-下拉刷新</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <style>
+        .tab-row {
+            border: none;
+            height: 1.5rem;
+            overflow-x: scroll;
+            -webkit-backface-visibility: hidden;
+            -webkit-perspective: 1000;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: row;
+        }
+        /*去除滚动条*/
+
+        .tab-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .seller-name {
+            width: 50%;
+            margin-left: 0.25rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .tab-item {
+            padding: 0 0.5rem;
+            white-space: nowrap;
+            font-size: 0.7rem;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            color: var(--theme-grey);
+        }
+
+        .tab-active {
+            color: var(--theme-black);
+            font-weight: bold;
+            border-bottom: 2px solid var(--theme-yellow);
+        }
+
+        .appoint {
+            width: 12.7rem;
+            height: 1.76rem;
+            background-color: #FF4081;
+            text-align: center;
+            line-height: 1.76rem;
+            color: var(--theme-color);
+            margin-left: 0.43rem;
+            border-radius: 0.35rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="flex-row flex-between" id='topLine' style="padding: 0.74rem 0.65rem 0.78rem; align-items: center; ">
+            <span style="font-size: 0.9rem; " v-text='cityName' @click='showCityOption'></span>
+            <img src="../image/search.png" style="width: 1.1rem; height: 1.1rem; margin-right: 0px; ">
+        </div>
+
+        <!-- 发布按钮 -->
+        <div class="flex-row " @click='gotoPublishGoods' style="background-color: #FFE082; width: 2.6rem; height: 2.6rem; border-radius: 50%; position: fixed; z-index: 1000; bottom: 0.65rem; right: 0.65rem; align-items: center; ">
+            <img src="../image/plus-white.png" style="width: 1.2rem; height: 1.2rem; margin: 0 auto;">
+        </div>
+
+        <!-- 轮播图占位 -->
+        <div class="" style="height: 440px;"></div>
+
+        <!-- 押金 -->
+        <div class="flex-col" style="height:5.21rem;width:16.7rem;margin:0 auto;border-radius:0.44rem; background-color:#3AB2BF;margin-top:0.65rem;">
+            <div class="" style='font-size:0.52rem;color:var(--theme-color);margin-left:1.40rem;margin-top:0.48rem'>乐器租赁2.0时代</div>
+            <div class="flex-row" style="font-size:1.75rem;color:var(--theme-color);margin-left:1.40rem;"><span style="font-weight:700;">零押金·</span>租金分期</div>
+        </div>
+        <div class="flex-row" style="margin-top:-0.9rem;">
+            <div @click='gotoHelp("了解", "summary")' style="width:1.76rem;height:1.76rem;background-color:#FDD835;border-radius:0.35rem;margin-left:1.63rem;">
+                <img src="../image/question.png" style="width:0.87rem;height:0.87rem;margin:0.43rem auto;">
+            </div>
+            <div class="appoint" @click='appointNow'>马上预约</div>
+        </div>
+
+
+
+        <div class="base-padding tab-row" style="width: 100%; margin-top: 0.7rem; font-size: 0.78rem;">
+            <div class="tab-item" v-bind:class='{"tab-active": selectedTabIndex == 0}' @click='tabClick(0)'>推荐</div>
+            <div class="tab-item" v-bind:class='{"tab-active": selectedTabIndex == 1}' @click='tabClick(1)'>闲置出租</div>
+            <div class="tab-item" v-bind:class='{"tab-active": selectedTabIndex == 2}' @click='tabClick(2)'>闲置转卖</div>
+        </div>
+
+        <div class="flex-row flex-between" style="width: 100%; font-size: 0.7rem; color: var(--theme-grey); ">
+            <div class="" style="width: 49%; padding-left: 0.65rem; ">
+                <div class="" style="width: 100%; background-color: white; margin-top: 0.7rem; " v-for="(item, index) in goodsList" v-if='index % 2 == 0'>
+                    <img :src="item.cover" style="width: 100%; height: auto; " @click='goodsClick(item)'>
+                    <div class="" style="width: 100%; padding: 0 0.4rem;">
+                        <span style="padding: 0.5rem 0px; " v-text="item.title" @click='goodsClick(item)'></span>
+                        <div class="flex-row flex-between " v-if='item.tradeType == 2'>
+                            <span style="color: #FF4685; font-weight: bold; font-size: 0.6rem; " v-text="'￥' + item.price"></span>
+                        </div>
+                        <div class="flex-col" style="font-size: 0.6rem; " v-if='item.tradeType == 1'>
+                            <div class="flex-row">
+                                <div>月租:</div>
+                                <div style="color: #FF4685; margin-left: 0.25rem; font-weight: bold; " v-text=" '￥'+item.price">￥100</div>
+                            </div>
+                            <div class="flex-row">
+                                <div>租期:</div>
+                                <div style="margin-left: 0.25rem; " v-text="item.rentTime + '个月起租'"></div>
+                            </div>
+                        </div>
+                        <div class="grey-line" style="margin-top: 0.5rem;"></div>
+                        <div class="flex-row" style="align-items: center; padding: 0.25rem 0; font-size: 0.6rem;" @click='gotoSeller(item)'>
+                            <img :src="item.seller.image" style="width: 1.1rem; height: 1.1rem; border-radius: 50%; ">
+                            <span class='seller-name' v-text=" item.seller.nickName"></span>
+                            <div class="" style="flex: 1;"></div>
+                            <span style="font-size: 0.45rem;" v-text="item.provinceName +'&sdot;' + item.cityName"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grey-line" style="height: 0.25rem; "></div>
+            </div>
+            <div class="" style="width: 2%; "></div>
+            <div class="" style="width: 49%; padding-right: 0.65rem; ">
+                <div class="" style="width: 100%; background-color: white; margin-top: 0.7rem;" v-for="(item, index) in goodsList" v-if='index % 2 == 1'>
+                    <img :src="item.cover" style="width: 100%; height: auto; " @click='goodsClick(item)'>
+                    <div class="" style="width: 100%; padding: 0 0.4rem;">
+                        <span style="padding: 0.5rem 0px; " v-text="item.title" @click='goodsClick(item)'></span>
+                        <div class="flex-row flex-between " v-if='item.tradeType == 2'>
+                            <span style="color: #FF4685; font-weight: bold; font-size: 0.6rem; " v-text="'￥' + item.price"></span>
+                        </div>
+                        <div class="flex-col" style="font-size: 0.6rem; " v-if='item.tradeType == 1'>
+                            <div class="flex-row">
+                                <div>月租:</div>
+                                <div style="color: #FF4685; margin-left: 0.25rem; font-weight: bold; " v-text=" '￥'+item.price">￥100</div>
+                            </div>
+                            <div class="flex-row">
+                                <div>租期:</div>
+                                <div style="margin-left: 0.25rem; " v-text="item.rentTime + '个月起租'"></div>
+                            </div>
+                        </div>
+                        <div class="grey-line" style="margin-top: 0.5rem;"></div>
+                        <div class="flex-row" style="align-items: center; padding: 0.25rem 0; font-size: 0.6rem;" @click='gotoSeller(item)'>
+                            <img :src="item.seller.image" style="width: 1.1rem; height: 1.1rem; border-radius: 50%; ">
+                            <span class='seller-name' v-text="item.seller.nickName"></span>
+                            <div class="" style="flex: 1;"></div>
+                            <span style="font-size: 0.45rem; " v-text="item.provinceName  + '&sdot;' + item.cityName"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grey-line" style="height: 0.25rem; "></div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/aui-dialog.js"></script>
+<script type="text/javascript" src="../script/aui-toast.js"></script>
+<script type="text/javascript" src="../script/vue.min.js"></script>
+<script type="text/javascript" src="../script/constant.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/fastclick.js"></script>
+<script type="text/javascript">
+    var UIScrollPicture;
+
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        UIScrollPicture = api.require('UIScrollPicture');
+
+        var params = api.pageParam; //页面传参
+        vm.userId = 3;
+        if (params.title) {
+            vm.title = params.title;
+        }
+
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 0
+            }
+        }, function(ret, err) {
+            console.log('scrolltobottom');
+            vm.getNextPage();
+        });
+
+        vm.initData();
+    };
+
+    function refreshData() {
+        vm.initData();
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            selectedTabIndex: 0,
+            scrollImgList: [],
+            scrollUrlList: [],
+            location: {
+                province: '',
+                city: ''
+            },
+            provinceName: '',
+            districtCode: '',
+            cityName: '',
+            bannerIndex: 0,
+            queryParams: {
+                tradeType: 0,
+                districtCode: ''
+            },
+            page: {
+                current: 1,
+                size: 10,
+                pages: 0,
+                total: 0
+            },
+            goodsList: {},
+            adList: {},
+        },
+        methods: {
+            initData() {
+                this.location = $api.getStorage('location');
+                console.log('location ' +JSON.stringify(this.location));
+                this.cityName = this.location.city;
+                this.districtCode = this.location.adCode;
+                this.provinceName = this.location.province;
+
+                this.getAdList();
+                this.page.current = 1;
+                this.getGoodsList();
+                // this.initScroll();
+            },
+            showCityOption() {
+                var that = this;
+                console.log('showCityOption');
+                var UIActionSelector = api.require('UIActionSelector');
+                UIActionSelector.open({
+                    datas: 'widget://res/city.json',
+                    layout: {
+                        row: 5,
+                        col: 3,
+                        height: 30,
+                        size: 12,
+                        sizeActive: 14,
+                        rowSpacing: 5,
+                        colSpacing: 10,
+                        maskBg: 'rgba(0,0,0,0.2)',
+                        bg: '#fff',
+                        color: '#888',
+                        // colorActive: '#f00',
+                        colorActive: '#3AB2BF',
+                        // colorSelected: '#f00'
+                        colorSelected: '#3AB2BF'
+                    },
+                    animation: true,
+                    cancel: {
+                        text: '取消',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    ok: {
+                        text: '确定',
+                        size: 12,
+                        w: 90,
+                        h: 35,
+                        bg: '#fff',
+                        bgActive: '#ccc',
+                        color: '#888',
+                        colorActive: '#fff'
+                    },
+                    title: {
+                        text: '请选择',
+                        size: 12,
+                        h: 44,
+                        bg: '#eee',
+                        color: '#888'
+                    }
+                    // fixedOn: api.frameName
+                }, function(ret, err) {
+                    console.log('UIActionSelector ' + JSON.stringify(ret));
+                    if (ret) {
+                        console.log(JSON.stringify(ret));
+                        that.provinceName = ret.selectedInfo[0].name;
+                        that.cityName = ret.selectedInfo[1].name;
+                        that.districtCode = ret.selectedInfo[2].id;// 区行政编码
+
+                        // 刷新商品列表
+                        that.page.current = 1;
+                        that.getGoodsList();
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
+                });
+            },
+            gotoHelp(title, code) {
+                api.openWin({
+                    name: 'help_detail',
+                    url: './setting/help_detail.html',
+                    pageParam: {
+                        title: title,
+                        code: code
+                    },
+                    reload: true
+                });
+            },
+            gotoSeller(item) {
+                api.openWin({
+                    name: 'user_page',
+                    url: './user/user_page.html',
+                    pageParam: {
+                        userId: item.seller.id,
+                        title: item.seller.nickName
+                    }
+                });
+            },
+            appointNow(){
+              api.openWin({
+                  name: 'make_appoint',
+                  url: './appoint/make_appoint.html',
+                  pageParam: {
+                      title: ''
+                  }
+              });
+            },
+            getAdList() {
+                var that = this;
+                var params = {
+                    queryParams: {
+                        position: 1
+                    }
+                };
+                // console.log('params ' + JSON.stringify(params));
+                ajaxPost('/ad/getList', params, function(ret, err) {
+                    // console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.scrollImgList = [];
+                            var list = ret.data.list;
+                            if (list != undefined && list.length > 0) {
+                                for (var i = 0; i < list.length; i++) {
+                                    var item = list[i];
+                                    that.scrollImgList.push(item.image);
+                                }
+                                // console.log(JSON.stringify(that.scrollImgList));
+                                that.initScroll();
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            getNextPage() {
+                if (this.page.current >= this.page.pages) {
+                    api.toast({
+                        msg: '没有更多内容',
+                        location: 'middle'
+                    });
+                    return;
+                }
+                this.page.current++;
+                this.getGoodsList();
+            },
+            getGoodsList() {
+                var that = this;
+                that.queryParams.districtCode = that.districtCode;
+                var params = {
+                    queryParams: that.queryParams,
+                    page: that.page
+                };
+                console.log('params ' + JSON.stringify(params));
+                ajaxPost('/goods/getList', params, function(ret, err) {
+                    // console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.page = ret.data.page;
+                            if (that.page.current == 1) {
+                                that.goodsList = ret.data.list;
+                            } else {
+                                that.goodsList.push.apply(that.goodsList, ret.data.list);
+                                api.pageDown(function(ret, err) {});
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            initScroll() {
+                var that = this;
+                // console.log(JSON.stringify(that.scrollImgList));
+                UIScrollPicture.open({
+                    rect: {
+                        x: 13,
+                        y: $api.dom('#topLine').offsetTop + $api.dom('#topLine').offsetHeight,
+                        w: api.winWidth - 26,
+                        h: 440
+                    },
+                    data: {
+                        paths: that.scrollImgList
+                    },
+                    cornerRadius: 0,
+                    styles: {
+                        indicator: {
+                            dot: { // （可选项）JSON对象；指示器小圆点样式；不传则使用系统默认小圆点样式
+                                w: 8, //（必选项）数字类型；小圆点宽度
+                                h: 8, //（必选项）数字类型；小圆点高度
+                                r: 5, //（必选项）数字类型；corner 页面控制器指示标记（矩形）的圆角大小
+                                margin: 5 //（必选项）数字类型；小圆点间距
+                            },
+                            align: 'center',
+                            color: '#FFFFFF',
+                            activeColor: '#FFCE54',
+                            bottom: 30
+                        }
+                    },
+                    placeholderImg: 'widget://res/slide1.jpg',
+                    contentMode: 'scaleToFill',
+                    interval: 3,
+                    loop: true,
+                    fixedOn: 'frame2',
+                    fixed: false
+                }, function(ret, err) {
+                    if (ret) {
+                        console.log(JSON.stringify(ret));
+                        if (ret.eventType == 'click') {
+                            console.log(ret.index);
+                        }
+                    } else {
+                        alert(JSON.stringify(err));
+                    }
+                });
+            },
+            gotoPublishGoods() {
+                if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                    api.openWin({
+                        name: 'phone_login1',
+                        url: './user/phone_login1.html',
+                        slidBackEnabled: true
+                    });
+                    return;
+                }
+
+                $api.rmStorage('selectedMediaList'); // 清空已选图片、视频
+                api.openWin({
+                    name: 'select_media',
+                    url: './blog/select_media.html',
+                    pageParam: {
+                        publishType: 'goods'
+                    },
+                    reload: true
+                });
+            },
+            goodsClick(item) {
+                // console.log(JSON.stringify(item));
+                api.openWin({
+                    name: 'goods_detail',
+                    url: './goods/goods_detail.html',
+                    pageParam: {
+                        goodsId: item.id,
+                        title: item.seller.nickName + '的宝贝'
+                    }
+                });
+            },
+            tabClick(index) {
+                this.selectedTabIndex = index;
+                if (index == 0) {
+                    this.queryParams.tradeType = 0;
+                } else if (index == 1) {
+                    this.queryParams.tradeType = 1;
+                } else {
+                    this.queryParams.tradeType = 2;
+                }
+                this.page.current = 1;
+                this.getGoodsList();
+            },
+
+        }
+    })
+</script>
+
+</html>

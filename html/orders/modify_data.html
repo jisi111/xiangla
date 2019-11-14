@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        .modi_body>div{
+          padding-left: 0.87rem;
+          padding-right: 0.87rem;
+        }
+        p>span{
+          float: right;
+          color:var(--theme-grey);
+          font-size: 0.78rem;
+        }
+        p{
+          color: var(--theme-black);
+          font-size: 0.78rem;
+        }
+        .modi_change{
+            border-top: 4px solid #f7f7f7;
+            padding-top: 0.87rem;
+            padding-bottom: 1.22rem;
+            border-bottom: 1px solid #f4f4f4;
+            overflow: hidden;
+        }
+        .modi_change>p{
+            font-size: 0.87rem;
+
+            line-height: 3.07rem;
+        }
+        .modi_change>p>img{
+          float: right;
+          vertical-align: center;
+          height: 3.07rem;
+          width: 3.07rem;
+        }
+        .modi_name{
+          padding-top: 0.74rem;
+          padding-bottom: 0.96rem;
+          border-bottom: 1px solid #f4f4f4;
+        }
+        .modi_city{
+          padding-top: 0.83rem;
+          padding-bottom: 0.92rem;
+          border-bottom: 1px solid #f4f4f4;
+        }
+        .modi_init{
+          padding-top: 0.83rem;
+        }
+        .modi_init>.init_recommend{
+          margin-top: 0.57rem;
+          color:var(--theme-grey);
+          padding-bottom: 0.92rem;
+          border-bottom: 1px solid #f4f4f4;
+        }
+        .modi_recommend{
+          padding-top: 0.92rem;
+        }
+        .modi_recommend>.reco_describe{
+          color:var(--theme-grey);
+          margin-top: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="modi_body">
+        <div class="modi_change">
+          <p>更换头像
+              <img src="../../image/group-cover-01.png" alt="">
+          </p>
+        </div>
+        <div class="modi_name">
+          <p>群名称 <span>Alice音乐中心</span></p>
+        </div>
+        <div class="modi_city">
+          <p>所在城市
+              <span>广东省·珠海市</span>
+          </p>
+        </div>
+        <div class="modi_init">
+          <p class='init_name'>发起人签名 <span>15/18</span></p>
+          <p class="init_recommend">星海音乐老师·钢琴老师·十年教学经验</p>
+        </div>
+          <div class="modi_recommend">
+            <p class="reco_name">群介绍  <span>15/140</span> </p>
+            <p class='reco_describe'>
+              很多人认为学钢琴的最佳年龄是5岁左右，过了这个年龄学钢琴难度就会加大，其实学钢琴与年龄无关，相关的是你的方法和坚持。
+            </p>
+          </div>
+
+
+
+
+
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+        },
+        methods: {
+            initData() {
+
+            },
+
+        }
+    })
+
+</script>
+
+</html>

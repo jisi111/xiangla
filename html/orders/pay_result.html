@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header id='header' class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <div>完成</div>
+        </a>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="flex-row" style="padding: 1.97rem 0 1.97rem 0.65rem;border-bottom: 0.52rem solid #F7F7F7 ;">
+        <div style="">
+            <img src="../../image/v2_pvau0u.png" alt="" style="width:1.53rem;height: 1.53rem;margin-right: 0.57rem;">
+        </div>
+        <div v-if='isSuccess' style="background-color:white;font-size: 1.22rem;">
+            恭喜您 订单支付完成
+        </div>
+        <div v-if='!isSuccess' style="background-color:white;font-size: 1.22rem;">
+            下单成功 请1小时内支付
+        </div>
+    </div>
+    <div class="flex=col" style="margin-right:0.65rem;margin-left: 0.65rem;margin-top: 1.05rem;">
+        <div class="flex-row" style="font-size:0.7rem;color:#101010;margin-bottom: 0.48rem;">
+            <span style="width: 30%; ">订单号</span>
+            <span style="" v-text='ordersId'></span>
+        </div>
+        <div class="flex-row" style="font-size:0.7rem;color:#101010;margin-bottom: 0.48rem;">
+            <span v-if='isSuccess' style="width: 30%; ">实付金额</span>
+            <span v-if='!isSuccess' style="width: 30%; ">待付金额</span>
+            <span style="">￥</span>
+            <span style="" v-text='totalAmount'></span>
+        </div>
+
+        <div class="flex-row" style="font-size:0.7rem;color:#101010" >
+            <span style="width: 30%; ">支付方式</span>
+            <span v-if='payType == 1' style="">支付宝</span>
+            <span v-if='payType == 2' style="">微信支付</span>
+        </div>
+        <div class="flex-row" style="font-size: 0.87rem;margin-top: 1.62rem;">
+            <div class="" @click='gotoHomePage'
+                style="width: 8rem;height: 2.19rem ;color:#9E9E9E;text-align:center;border: 1px solid #9E9E9E ; line-height:2.19rem">
+                返回首页
+            </div>
+            <div class="flex-1"></div>
+            <div class="" @click='gotoDetail'
+                style="width: 8rem; height:2.19rem;color:#282828; background-color:#FFDD00;text-align:center;line-height:2.19rem ">
+                查看订单
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.ordersId = params.ordersId;
+        vm.tradeType = params.tradeType;
+        vm.payType = params.payType;
+        vm.totalAmount = params.totalAmount;
+        vm.isSuccess = params.isSuccess;
+
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '支付详情',
+            totalAmount: 0,
+            tradeType: 1,
+            ordersId: '',
+            payType: 1,
+            isSuccess: false,
+        },
+        methods: {
+            initData() {
+
+            },
+            gotoHomePage() {
+                api.closeToWin({
+                    name: 'root'
+                });
+            },
+            gotoDetail() {
+                var tabIndex = this.isSuccess ? 1 : 0;
+                console.log('tradeType ' + this.tradeType);
+                if (this.tradeType == 1) {
+                    api.openWin({
+                        name: 'rent_in_list',
+                        url: './rent_in_list.html',
+                        pageParam: {
+                            tabIndex: tabIndex
+                        }
+                    });
+                } else {
+                    api.openWin({
+                        name: 'buy_list',
+                        url: './buy_list.html',
+                        pageParam: {
+                            tabIndex: tabIndex
+                        }
+                    });
+                }
+            },
+
+        }
+    })
+
+</script>
+
+</html>

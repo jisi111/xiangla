@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+    .aui-tab-item {
+        padding: 0 0.5rem;
+        font-size: 0.65rem;
+    }
+    .aui-active {
+        font-weight: bold;
+    }
+    .rent_name,.rent_order,.rent_wait{
+        overflow: hidden;
+        padding: 0.75rem 0.65rem;
+        background-color: var(--theme-color);
+    }
+    .rent_name>img{
+        width: 5.25rem;
+        height: 5.25rem;
+        float: left;
+        vertical-align: center;
+        margin-right: 0.45rem;
+    }
+    .rent_name>p,.rent_order>p{
+      color:var(--theme-black);
+    }
+    .rent_name>.rent-commend{
+        height: 1.92rem;
+      margin-bottom: 0.75rem;
+    }
+    .rent_name>.rent-price1>span{
+        margin-left: 0.35rem;
+        font-size: 1.2rem;
+        color: #E51C23;
+    }
+
+    /*订单详情*/
+    .rent_order{
+        border-top: 1px solid #F4F4F4 ;
+    }
+    .rent_order>p{
+      font-size: 0.7rem;
+      height: 1.2rem;
+      line-height: 1.2rem;
+      margin-bottom: 0.4rem;
+    }
+     .rent_order>p>span{
+      float: right;
+    }
+    .rent_order>.details{
+      float: right;
+      color:#9E9E9E;
+    }
+    .rent_order>.details>img{
+      width: 0.55rem;
+      height: 0.55rem;
+      transform: rotate(180deg);
+      display: inline-block;
+    }
+    .rent_wait{
+      border-top: 1px solid #f4f4f4;
+    }
+      .rent_wait>p{
+        font-size: 0.8rem;
+        color: #E51C23 ;
+      }
+      .rent_wait{
+        border-bottom: 0.5rem solid #F7F7F7;
+      }
+      .rent_wait>p> .button{
+        float: right;
+        /*height: 1.3rem;
+        width: 3.5rem;*/
+        padding:0.2rem 1.25rem;
+        background-color: #E51C23 ;
+        color:var(  --theme-color);
+        font-size: 0.7rem;
+        border-radius: 1.5rem;
+            }
+      .rent_wait>p>span{
+          margin-left: 1.75rem;
+      }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class='flex-row flex-between' id='topLine' style="margin-top:0px;">
+        <div class="aui-tab base-padding" style="width: 100%; ">
+            <div class="aui-tab-item" @click='topClick(0)'
+                v-bind:class='{"aui-active": selectedTabIndex == 0}'>待付款</div>
+            <div class="aui-tab-item" @click='topClick(1)'
+                v-bind:class='{"aui-active": selectedTabIndex == 1}'>待发货</div>
+            <div class="aui-tab-item" @click='topClick(2)'
+                v-bind:class='{"aui-active": selectedTabIndex == 2}'>待签收</div>
+                <div class="aui-tab-item" @click='topClick(3)'
+                    v-bind:class='{"aui-active": selectedTabIndex == 3}'>出租中</div>
+                    <div class="aui-tab-item" @click='topClick(4)'
+                        v-bind:class='{"aui-active": selectedTabIndex == 4}'>押金</div>
+        </div>
+    </div>
+
+        <!-- 商品名称 -->
+      <div class="rent_name">
+        <img src="../../image/blog-01.png" alt="图片">
+        <p class='rent-commend aui-ellipsis-2 '>日本原装进口kawai钢kup132用了1年多，平时保养维护到位，外观无磨损...</p>
+        <p class = 'rent-price1'>月租 <span>￥300</span></p>
+        <p class = 'rent-price2'>押金: &nbsp;&nbsp;&nbsp;30000元</p>
+      </div>
+      <!--订单详情  -->
+      <div class="rent_order">
+        <p>订单号<span>ZL20190708000000000001</span></p>
+        <p>卖家昵称<span>ddi罗晓波</span></p>
+        <p>租期<span>一年/365天</span></p>
+        <p>起租期<span>2019-07-08</span></p>
+        <p>结束期<span>2020-06-30</span></p>
+        <p>交易时间<span>2019-07-08 17:35:25</span></p>
+        <p class='details'>订单详情 <img src="../../image/gray_return.png" alt=""></p>
+      </div>
+      <!-- 等待租户付款 -->
+      <div class="rent_wait">
+        <p v-show='selectedTabIndex == 0'>等待租户付款
+         </p>
+         <p v-show='selectedTabIndex == 1'>
+           租户已付款，请尽快发货
+
+             <span class="button">发货</span>
+         </p>
+         <p v-show='selectedTabIndex == 2'>
+           已发货，等待租户签收
+
+           <span class="button">提醒发货</span>
+           <span style='color:#9E9E9E; font-size: 0.6rem;margin-left: 0px; margin-top: 0.5rem'>*发货后5日内租户未签收的，系统将自动确认租户已签收。</span>
+         </p>
+         <p v-show='selectedTabIndex == 3'>出租中<span>结束期 2020-06-30</span></p>
+         <p v-show='selectedTabIndex == 4'>已收押金/人民币30000元
+      
+            <span class="button">退还押金</span>
+         </p>
+      </div>
+
+
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+            selectedTabIndex: 0
+        },
+        methods: {
+            initData() {
+
+            },
+            topClick(index) {
+              this.selectedTabIndex = index;
+            },
+
+        }
+    })
+
+</script>
+
+</html>

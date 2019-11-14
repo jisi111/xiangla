@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板-下拉刷新</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <style>
+        .red-dot {
+            margin-left: 0.25rem;
+            width: 0.4rem;
+            height: 0.4rem;
+            background: #ff2600;
+            border-radius: 0.5rem;
+        }
+        .aui-tab-item {
+            padding: 0 0.5rem;
+            font-size: 0.7rem;
+            color: white !important;
+        }
+        .aui-active {
+            font-weight: bold;
+            color: white;
+            border-bottom: 2px solid #515151 !important;
+        }
+        .tab-bottom {
+            width: 1.5rem;
+            height: 2px;
+            margin: 0 auto;
+            background-color: #515151;
+        }
+        .tab-bottom-active {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="flex-row flex-between" id='topLine'
+        style="padding: 0.9rem 0.65rem; background-color: #515151; font-size: 0.9rem; color: white; ">
+        <span style="font-size: 0.9rem; ">消息中心</span>
+    </div>
+
+    <!-- tab切换 -->
+    <div class="aui-tab " style="width: 100%; background-color: #515151;">
+        <div class="aui-tab-item" @click='tabClick(0)' style="font-size: 0.7rem !important;">
+            私信
+            <div class="aui-dot" v-if='newChatMsgNum > 0' style="position: absolute; top:40%; left: 66%; z-index: 20; "></div>
+        </div>
+        <div class="aui-tab-item" @click='tabClick(1)' style="font-size: 0.7rem !important;">
+            评论
+            <div class="aui-dot" v-if='newCommentMsgNum > 0' style="position: absolute; top:40%; left: 66%; z-index: 20; "></div>
+        </div>
+        <div class="aui-tab-item" @click='tabClick(2)' style="font-size: 0.7rem !important;">
+            通知
+            <div class="aui-dot" v-if='newNoticeMsgNum > 0' style="position: absolute; top:40%; left: 66%; z-index: 20; "></div>
+        </div>
+    </div>
+    <!-- 底部高亮 -->
+    <div class="flex-row" style="width: 100%; height: 2px; ">
+        <div class="" style="flex: 1; background-color: #515151;">
+            <div class="tab-bottom" v-bind:class='{"tab-bottom-active": selectedTabIndex == 0}'></div>
+        </div>
+        <div class="" style="flex: 1; background-color: #515151;">
+            <div class="tab-bottom" v-bind:class='{"tab-bottom-active": selectedTabIndex == 1}'></div>
+        </div>
+        <div class="" style="flex: 1; background-color: #515151;">
+            <div class="tab-bottom" v-bind:class='{"tab-bottom-active": selectedTabIndex == 2}'></div>
+        </div>
+    </div>
+    <div class="grey-line"></div>
+
+    <!-- 私信 -->
+    <div class="" v-show='selectedTabIndex == 0'>
+        <div class="" style="width: 100%; " v-for='(item, index) in chatConvList' >
+            <div class="flex-row base-padding" style="margin: 0.65rem 0; " @click='gotoChat(item, index)'
+                @touchstart="showDeleteButton(item, index)" @touchend="clearLoop">
+                <div class="" style="width: 2.15rem; height: 2.15rem; position: relative; ">
+                    <img v-if='item.targetUserImg != undefined' :src="item.targetUserImg" style="width: 2.15rem; height: 2.15rem; position: absolute; top:0; left: 0; z-index: 10; border-radius: 50%; ">
+                    <img v-if='item.targetUserImg == undefined' src="../image/user-photo.png" style="width: 2.15rem; height: 2.15rem; position: absolute; top:0; left: 0; z-index: 10; border-radius: 50%; ">
+                    <div class="aui-badge" v-if='item.unreadMessageCount > 0'
+                        style="position: absolute; top:0; left: 0; z-index: 20; "
+                        v-text='item.unreadMessageCount'></div>
+                </div>
+                <div class="" style="flex: 1; padding-left: 0.5rem; ">
+                    <div class="flex-row flex-between " >
+                        <span style="font-size: 0.7rem; " v-if='item.targetUserName == undefined' >--</span>
+                        <span style="font-size: 0.7rem; " v-if='item.targetUserName != undefined' v-text='item.targetUserName'></span>
+                        <span style="font-size: 0.6rem; color: var(--theme-grey); " v-text='getFormatTimeNum(item.receivedTime)'></span>
+                    </div>
+                    <span style="font-size: 0.7rem; color: var(--theme-grey); " v-text='item.latestMessage.text'></span>
+                </div>
+            </div>
+            <div class="grey-line"></div>
+        </div>
+
+    </div>
+
+    <!-- 评论 -->
+    <div class="" style="width: 100%; " v-show='selectedTabIndex == 1'>
+        <div class="" style="width: 100%; " v-for='(item, index) in commentMsgList'>
+            <div class="flex-row base-padding" style="margin-top: 0.65rem; ">
+                <img :src="item.extraInfo.commentatorImage" style="width: 2.15rem; height: 2.15rem; border-radius: 50%; ">
+                <div class="" style="padding-left: 0.5rem; ">
+                    <div class="flex-row flex-between " v-text='item.extraInfo.commentatorName'
+                        style='font-size: 0.7rem;' ></div>
+                    <div style="font-size: 0.6rem; color: var(--theme-grey); "
+                        v-text='getFormatTime(item.extraInfo.createTime)'></div>
+                </div>
+            </div>
+            <div class="flex-row base-padding" style="color: #FF4081; font-size: 0.7rem; margin-top: 0.5rem; ">
+                <span v-text='item.extraInfo.title'></span>
+                <span v-text='item.extraInfo.content' style="margin-left: 0.25rem; "></span>
+            </div>
+            <div class="grey-line" style="margin-top: 0.5rem; "></div>
+            <!-- <div class="base-padding">
+                <div class="flex-row" style="font-size: 0.7rem; margin-top: 0.5rem; padding: 0.25rem 0.5rem; background-color: var(--theme-light-grey); border-radius: 0.25rem; ">
+                    <span style="color: var(--theme-black); ">小妞妈妈:</span>
+                    <span style="color: var(--theme-grey); margin-left: 0.25rem;  ">游，使劲游</span>
+                </div>
+            </div> -->
+        </div>
+    </div>
+
+    <!-- 通知 -->
+    <div class="" style="width: 100%; " v-show='selectedTabIndex == 2'>
+        <div class="" style="width: 100%; " v-for='(item, index) in noticeMsgList'>
+            <div class="flex-row base-padding" style="margin-top: 0.85rem; " >
+                <img src="../image/notice.png" style="width: 1.25rem; height: 1.25rem; ">
+                <div class="" style="padding-left: 0.5rem; ">
+                    <div class="flex-row" style="align-items: center; ">
+                        <div class="" v-if='item.extraInfo' v-text='item.extraInfo.title'
+                            style='font-size: 0.7rem; color: var(--theme-black); '></div>
+                        <div class="red-dot" v-if='item.isRead == false'></div>
+                        <div class="" style="margin-left: auto; font-size: 0.6rem; color: var(--theme-grey); "
+                            v-text='getFormatTime(item.extraInfo.createTime)'></div>
+                    </div>
+                    <div class="" v-if='item.extraInfo' v-text='item.extraInfo.content'
+                        style='font-size: 0.7rem; margin-top: 0.5rem; color: var(--theme-grey); '></div>
+                </div>
+            </div>
+            <div class="grey-line" style='margin-top: 0.65rem; '></div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../script/vue.min.js"></script>
+<script type="text/javascript" src="../script/constant.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/fastclick.js"></script>
+<script type="text/javascript">
+    var timeLoop;
+    var rong;
+
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+
+        rong = api.require('rongCloud2');
+        vm.initData();
+
+        api.addEventListener({
+            name: 'subChatNewMsgNum'
+        }, function(ret, err) {
+            vm.newChatMsgNum -= ret.value.num;
+            // 聊天对应的这一行，计数设置为0
+            for (var i = 0; i < vm.chatConvList.length; i++) {
+                var item = vm.chatConvList[i];
+                if (item.targetId == ret.value.targetId) {
+                    console.log('set unreadMessageCount 0');
+                    vm.$set(item, 'unreadMessageCount', 0);
+                }
+            }
+        })
+    };
+
+    function refreshData() {
+        vm.initData();
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            selectedTabIndex: 0,
+            convList: [],
+            chatConvList: [],// 聊天消息conversation列表
+            commentConv: {},// “评论”栏conversation，从id=2的官方客服发出
+            noticeConv: {},// “消息”栏conversation，从id=3的官方客服发出
+            commentMsgList: [],// “评论”栏消息列表
+            noticeMsgList: [],//  “消息”栏消息列表
+            newChatMsgNum: 0,
+            newCommentMsgNum: 0,
+            newNoticeMsgNum: 0,
+            userIdList: [],
+            oldestNoticeMsgId: -1,
+            oldestCommentMsgId: -1,
+        },
+        methods: {
+            showDeleteButton(item, index) {
+                var that = this;
+                clearInterval(timeLoop);
+                timeLoop = setTimeout(function(){
+                    var dialog = new auiDialog();
+                    dialog.alert({
+                        title:"提示",
+                        msg:'是否删除聊天记录',
+                        buttons:['取消', '确定']
+                    }, function(ret) {
+                        if (ret.buttonIndex == 2) {
+                            that.delConversation(item, index);
+                        }
+                    })
+                }, 500);
+            },
+            clearLoop() {
+                clearInterval(timeLoop);
+            },
+            delConversation(item, index) {
+                var that = this;
+                console.log('delConversation ' + JSON.stringify(item));
+                rong.clearMessages({
+                    conversationType: 'PRIVATE',
+                    targetId: item.targetId
+                }, function(ret, err) {
+                    console.log('clearMessages ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                    that.chatConvList.splice(index, 1);
+                })
+            },
+            getFormatTimeNum(time) {
+                return timeDiff(time);
+            },
+            getFormatTime(time) {
+                var startDate = time.replace(new RegExp("-","gm"),"/");
+                var startDateM = (new Date(startDate)).getTime(); //得到毫秒数
+                return timeDiff(startDateM);    
+            },
+            getUserListInfo() {
+                var that = this;
+                if (this.userIdList.length == 0) {
+                    return;
+                }
+                var ids = that.userIdList.join(",");
+                ajaxPost('/user/getListByIds', ids, function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            var list = ret.data;
+                            for (var i = 0; i < list.length; i++) {
+                                var item = list[i];
+                                // 聊天消息列表中，userId相同的，填入查到的用户信息
+                                for (var j = 0; j < that.chatConvList.length; j++) {
+                                    var conv = that.chatConvList[j];
+                                    if (item.id == conv.targetId) {
+                                        that.$set(that.chatConvList[j], 'targetUserImg', item.image);
+                                        that.$set(that.chatConvList[j], 'targetUserName', item.nickName);
+                                    }
+                                }
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            gotoChat(item, index) {
+                console.log('gotoChat ' + JSON.stringify(item));
+                // 去掉列表中该行的消息数提示
+                this.$set(this.chatConvList[index], 'unreadMessageCount', 0);
+                if (item.extraInfo == undefined) {
+                    api.toast({
+                        msg: '用户信息获取失败',
+                        location: 'middle'
+                    });
+                    return;
+                }
+
+                api.openWin({
+                    name: 'chat_win',
+                    url: './goods/chat_win.html',
+                    pageParam: {
+                        targetId: item.targetId,
+                        title: item.extraInfo.senderName
+                    }
+                });
+            },
+            initData() {
+                console.log('frame3 initData');
+                var that = this;
+                rong.getConversationList(function(ret, err) {
+                    console.log('rongCloud getConversationList ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                    if (ret.status == 'success') {
+                        that.convList = ret.result;
+
+                        // 区分聊天、评论、通知
+                        that.chatConvList = [];
+                        for (var i = 0; i < that.convList.length; i++) {
+                            var item = that.convList[i];
+                            if (item.senderUserId == '2') {// “评论”客服所发
+                                that.commentConv = item;
+                                if (item.unreadMessageCount > 0) {
+                                    that.newCommentMsgNum += item.unreadMessageCount;// “评论”未读消息总数
+                                }
+                            } else if (item.senderUserId == '3') {// “通知”客服所发
+                                that.noticeConv = item;
+                                console.log('unreadMessageCount ' + item.unreadMessageCount);
+                                if (item.unreadMessageCount > 0) {
+                                    that.newNoticeMsgNum += item.unreadMessageCount;// “通知”未读消息总数
+                                }
+                                console.log('newNoticeMsgNum ' + that.newNoticeMsgNum);
+                            } else {// 普通聊天消息
+                                if (item.latestMessage != undefined && item.latestMessage != '') {// 要加判断，因为有测试时删除不掉的数据
+                                    that.chatConvList.push(item);
+                                }
+                                console.log('unreadMessageCount ' + item.unreadMessageCount);
+                                if (item.unreadMessageCount > 0) {
+                                    that.newChatMsgNum += item.unreadMessageCount;// 未读消息总数
+                                }
+                                console.log('newChatMsgNum ' + that.newChatMsgNum);
+                            }
+                        }
+                        console.log('commentConv ' + JSON.stringify(that.commentConv));
+                        console.log('noticeConv ' + JSON.stringify(that.noticeConv));
+
+                        // 查询聊天消息列表中，对方userId
+                        that.userIdList = [];
+                        for (var i = 0; i < that.chatConvList.length; i++) {
+                            var item = that.chatConvList[i];
+                            // 发送对象用户id，用于查询用户名称、图片
+                            if (item.targetId != undefined && item.targetId != 'undefined'
+                                && (that.userIdList).indexOf(item.targetId) < 0) {
+                                that.userIdList.push(item.targetId);
+                            }
+                            if (item != undefined && item.latestMessage != undefined) {
+                                var extraInfo = JSON.parse(item.latestMessage.extra);
+                                that.$set(that.chatConvList[i], 'extraInfo', extraInfo);
+                            }
+                        }
+                        // 根据对方userId，查询头像、昵称
+                        that.getUserListInfo();
+                    }
+                })
+            },
+            getNoticeNewMsgList() {
+                var that = this;
+                rong.getLatestMessages({
+                    conversationType: 'PRIVATE',
+                    targetId: '3',// targetId是指聊天对方的id，与这条消息发送的方向无关，不是本手机用户id
+                    count: 10
+                }, function(ret, err) {
+                    console.log('notice getLatestMessages ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                    if (ret.status == 'success') {
+                        var tempList = [];
+                        for (var i = 0; i < ret.result.length; i++) {
+                            var item = ret.result[i];
+                            var extraInfo = JSON.parse(item.content.extra);// 解析extra数据
+                            that.$set(item, 'extraInfo', extraInfo);
+
+                            // 是否已读，isRead字段，ios不支持isRead，要从receivedStatus判断
+                            if (api.systemType == 'ios') {
+                                if (item.receivedStatus == 'READ') {
+                                    that.$set(item, 'isRead', true);
+                                } else {
+                                    that.$set(item, 'isRead', false);
+                                }
+                            }
+
+                            tempList.push(item);
+                        }
+                        // console.log(JSON.stringify(tempList));
+                        that.noticeMsgList = tempList;
+
+                        if (that.noticeMsgList.length > 0) {
+                            that.oldestNoticeMsgId = that.noticeMsgList[0].messageId;
+                        }
+
+                        // that.getNoticeHistoryMsgList();// 读取历史消息
+                    }
+                })
+            },
+            getCommentNewMsgList() {
+                var that = this;
+                rong.getLatestMessages({
+                    conversationType: 'PRIVATE',
+                    targetId: '2',// 2是发送评论消息的官方客服，targetId是指聊天对方的id，与这条消息发送的方向无关，不是本手机用户id
+                    count: 10
+                }, function(ret, err) {
+                    console.log('comment getLatestMessages ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                    if (ret.status == 'success') {
+                        var tempList = [];
+                        for (var i = 0; i < ret.result.length; i++) {
+                            var item = ret.result[i];
+                            var extraInfo = JSON.parse(item.content.extra);// 解析extra数据
+                            that.$set(item, 'extraInfo', extraInfo);
+
+                            // 是否已读，isRead字段，ios不支持isRead，要从receivedStatus判断
+                            if (api.systemType == 'ios') {
+                                if (item.receivedStatus == 'READ') {
+                                    that.$set(item, 'isRead', true);
+                                } else {
+                                    that.$set(item, 'isRead', false);
+                                }
+                            }
+
+                            tempList.push(item);
+                        }
+                        // console.log(JSON.stringify(tempList));
+                        that.commentMsgList = tempList;
+
+                        if (that.commentMsgList.length > 0) {
+                            that.oldestCommentMsgId = that.commentMsgList[0].messageId;
+                        }
+                    }
+                })
+            },
+            // getNoticeHistoryMsgList() {
+            //     var that = this;
+            //     console.log('oldestNoticeMsgId ' + that.oldestNoticeMsgId);
+            //     rong.getHistoryMessages({
+            //         conversationType: 'SYSTEM',
+            //         targetId: '3',
+            //         oldestMessageId: that.oldestNoticeMsgId,
+            //         count: 10
+            //     }, function(ret, err) {
+            //         console.log('notice getHistoryMessages ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+            //         // 逆序
+            //         var tempList = [];
+            //         for (var i = ret.result.length - 1; i >= 0; i--) {
+            //             var item = ret.result[i];
+            //             if (item.content.extra) {
+            //                 var extraInfo = JSON.parse(item.content.extra);
+            //                 that.$set(item, 'extraInfo', extraInfo);
+            //             }
+            //             tempList.push(item);
+            //         }
+            //         // console.log(JSON.stringify(tempList));
+            //         if (tempList.length > 0) {
+            //             that.noticeMsgList.push.apply(that.noticeMsgList, tempList);// 加到现有数据后面
+            //         }
+            //     })
+            // },
+            setCommentMsgRead() {
+                rong.clearMessagesUnreadStatus({
+                    conversationType: 'PRIVATE',
+                    targetId: '2'
+                }, function(ret, err) {
+                    console.log('comment clearMessagesUnreadStatus ' + JSON.stringify(ret));
+                })
+            },
+            setNoticeMsgRead() {
+                rong.clearMessagesUnreadStatus({
+                    conversationType: 'PRIVATE',
+                    targetId: '3'
+                }, function(ret, err) {
+                    console.log('notice clearMessagesUnreadStatus ' + JSON.stringify(ret));
+                })
+                // var that = this;
+                // for (var i = 0; i < that.noticeMsgList.length; i++) {
+                //     var item = that.noticeMsgList[i];
+                //     if (item.isRead == false) {
+                //         console.log('unread item ' + JSON.stringify(item));
+                //         rong.setMessageReceivedStatus({
+                //             messageId: item.messageId,
+                //             receivedStatus: 'READ'
+                //         }, function(ret, err) {
+                //             if (ret.status != 'success') {
+                //                 console.log('setMessageReceivedStatus err ' + JSON.stringify(err));
+                //                 api.toast({ msg: JSON.stringify(err) });
+                //             }
+                //         })
+                //     }
+                // }
+            },
+            tabClick(index) {
+                // 跳转之前的值
+                if (this.selectedTabIndex == 0) {// 从“私信”切换到其他
+
+                } else if (this.selectedTabIndex == 1) {// 从“评论”切换到其他
+                    console.log('newCommentMsgNum ' + this.newCommentMsgNum);
+                    api.sendEvent({
+                        name: 'subCommentNewMsgNum',
+                        extra: {
+                            num: this.newCommentMsgNum,
+                            targetId: this.targetId
+                        }
+                    });
+                    this.newCommentMsgNum = 0;
+                    this.setCommentMsgRead();
+                } else if (this.selectedTabIndex == 2) {// 从“通知”切换到其他
+                    console.log('newNoticeMsgNum ' + this.newNoticeMsgNum);
+                    api.sendEvent({
+                        name: 'subNoticeNewMsgNum',
+                        extra: {
+                            num: this.newNoticeMsgNum,
+                            targetId: this.targetId
+                        }
+                    });
+                    this.newNoticeMsgNum = 0;
+                    this.setNoticeMsgRead();
+                }
+
+                this.selectedTabIndex = index;// 跳转之后的值
+
+                if (index == 0) {// “私信”
+                    this.newChatMsgNum = 0;
+                } else if (index == 1) {// “评论”
+                    this.getCommentNewMsgList();
+                } else if (index == 2) {// “通知”
+                    this.getNoticeNewMsgList();
+                }
+            },
+
+        }
+    })
+
+</script>
+
+</html>

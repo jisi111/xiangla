@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>首页</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <style>
+        .aui-tab-item {
+            padding: 0 0.5rem;
+            font-size: 0.85rem;
+        }
+        .aui-active {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class='flex-row flex-between' id='topLine' style="margin-top: 1.25rem; ">
+        <div class="aui-tab base-padding" style="width: 60%; ">
+            <div class="aui-tab-item" @click='tabClick(0)'
+                v-bind:class='{"aui-active": selectedTabIndex == 0}'>推荐</div>
+            <div class="aui-tab-item" @click='tabClick(1)'
+                v-bind:class='{"aui-active": selectedTabIndex == 1}'>关注</div>
+            <!-- <div class="aui-tab-item" @click='tabClick(2)'
+                v-bind:class='{"aui-active": selectedTabIndex == 2}'>啦群</div> -->
+        </div>
+        <div class="" style="flex: 1; "></div>
+        <div class="flex-row" style="align-items: center; ">
+            <img src="../image/add-user.png" style="width: 1.1rem; height: 1.1rem; margin-right: 0.85rem; " @click=" add" >
+            <img src="../image/search.png" style="width: 1.1rem; height: 1.1rem; margin-right: 0.75rem; " @click="sear">
+        </div>
+    </div>
+    <div class="grey-line"></div>
+
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/aui-tab.js"></script>
+<script type="text/javascript" src="../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../script/vue.min.js"></script>
+<script type="text/javascript" src="../script/constant.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        openFrames();
+    }
+
+    function swipeLeft() {
+        if (vm.selectedTabIndex == 0) {
+            vm.tabClick(1);
+        }
+    }
+
+    function swipeRight() {
+        if (vm.selectedTabIndex == 1) {
+            vm.tabClick(0);
+        }
+    }
+
+    function refreshData() {
+        console.log('frame0 refreshData ' + vm.framesReady);
+        if (vm.framesReady) {// 加这个判断，是因为index.html刚刚加载完成时，就会调用refreshData，此时可能frame0中的frames还没准备好
+            if (vm.selectedTabIndex == 0) {
+                api.execScript({
+                    frameName: 'recommend',
+                    script: 'refreshData()'
+                });
+            } else {
+                api.execScript({
+                    frameName: 'follow',
+                    script: 'refreshData()'
+                });
+            }
+        }
+    }
+
+    function openFrames() {
+        var statusBarHeight = parseInt(localStorage.getItem('statusBarHeight'));
+        api.openFrameGroup({
+            name: 'homeFramePages',
+            scrollEnabled: false,
+            rect: {
+                x: 0,
+                y: $api.dom('#topLine').offsetTop + $api.dom('#topLine').offsetHeight + statusBarHeight + 1,
+                w: 'auto',
+                h: api.frameHeight - ($api.dom('#topLine').offsetTop + $api.dom('#topLine').offsetHeight + 1)
+            },
+            index: vm.selectedTabIndex,
+            frames: [{
+                name: 'recommend',
+                url: './blog/recommend.html',
+                bounces: true
+            },
+            {
+                name: 'follow',
+                url: './blog/follow.html',
+                bounces: true
+            }
+            // , {
+            //     name: 'groups',
+            //     url: './home/groups.html',
+            //     bounces: true
+            // }
+            ]
+        }, function (ret, err) {
+            if (ret) {
+                // console.log('frame0 openFrameGroup ' + JSON.stringify(ret));
+                vm.framesReady = true;
+            }
+        });
+    }
+    function showFrames() {
+        api.setFrameGroupAttr({
+            name: 'homeFramePages',
+            hidden: false
+        });
+    }
+    function hideFrames() {
+        api.setFrameGroupAttr({
+            name: 'homeFramePages',
+            hidden: true
+        });
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            selectedTabIndex: 0,
+            framesReady: false,
+        },
+        methods: {
+            add(){
+                api.openWin({
+                    name: 'invite_friend',
+                    url: './user/invite_friend.html',
+                    pageParam: {
+                        name: 'test'
+                    }
+                });
+            },
+            sear(){
+                api.openWin({
+                    name: 'user_',
+                    url: './user/user_sear.html',
+                    pageParam: {
+                        name: 'test'
+                    }
+                });
+            },
+            initData() {
+
+            },
+            tabClick(index) {
+                // 未登录跳转登录
+                if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                    api.openWin({
+                        name: 'phone_login1',
+                        url: './user/phone_login1.html',
+                        slidBackEnabled: true
+                    });
+                    return;
+                }
+
+                this.selectedTabIndex = index;
+                api.setFrameGroupIndex({
+                    name: 'homeFramePages',
+                    index: index
+                });
+                if (index == 0) {
+                    api.execScript({
+                        frameName: 'recommend',
+                        script: 'refreshData()'
+                    });
+                } else if (index == 1) {
+                    api.execScript({
+                        frameName: 'follow',
+                        script: 'refreshData()'
+                    });
+                }
+                // else {
+                //     api.execScript({
+                //         frameName: 'groups',
+                //         script: 'refreshData()'
+                //     });
+                // }
+            },
+
+        }
+    })
+
+
+</script>

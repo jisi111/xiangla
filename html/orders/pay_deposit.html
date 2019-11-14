@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="aui-bar aui-bar-nav theme-bg header-fix">
+            <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+            <div class="aui-title" style="display: flex; ">
+                <div style="margin: 0 auto; display: flex;">
+                    <div style="" v-text='title'></div>
+                </div>
+            </div>
+        </header>
+        <!--高度至少1px才能有效偏移-->
+        <div id='first-el' style="height: 1px; "></div>
+        <div class="flex-col"
+            style="color:red;width: 18.02rem;height: 6.62rem;text-align:center;font-size: 1.57rem; display: table-cell;vertical-align:middle">
+            <div class="" v-text="'￥' + ordersDetail.deposit"></div>
+            <div class="" style="color:var(--theme-grey) ; font-size: 0.75rem;">
+                应退押金
+            </div>
+        </div>
+        <div class="" style="height:0.43rem;background-color: #F7F7F7;">
+
+        </div>
+        <div class="" style=" padding: 1.09rem  0.65rem  1.31rem 0.65rem;">
+            <p class="" style="font-size: 0.87rem;border-bottom: 1px solid #F4F4F4;padding-bottom: 0.65rem;">选择支付方式</p>
+            <div class="flex-row" style="padding-top: 0.92rem;">
+                <img src="../../image/v2_px1fqw.png" alt="支付宝" style="width:1.31rem;height:1.31rem;margin-right: 1.31rem;">
+                <label for="pay">支付宝</label>
+                <div class="flex-1">
+                </div>
+                <input type="radio" name="pay" class="aui-radio" id='pay' v-model="orders.payType" value='1'>
+            </div>
+            <div class="flex-row" style="border-bottom:1px solid  #F4F4F4;padding: 0.87rem 0 0.87rem 0">
+                <img src="../../image/wx.jpg" alt="微信" style="width:1.31rem;height:1.31rem;margin-right: 1.31rem;">
+                <label for="pay">微信支付</label>
+                <div class="flex-1">
+                </div>
+                <input type="radio" name="pay" class="aui-radio" id='pay' v-model="orders.payType" value='2'>
+            </div>
+        </div>
+        <div class="" style="height: 0.43rem;background-color: #F7F7F7;">
+        </div>
+        <div class="" style="height: 2.63rem;">
+        </div>
+        <div class="" style="text-align:center;">
+            <span @click='payOrders' style="background-color:#3AB2BF;width: 16.7rem;height: 2.19rem; border-radius: 0.43rem;color:#FFFFFF;line-height:2.19rem">
+                确认支付
+            </span>
+        </div>
+
+    </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.ordersDetail = params.ordersDetail;
+        console.log("ordersDetail " + JSON.stringify(vm.ordersDetail));
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '押金',
+            ordersDetail: {},
+            orders: {
+                payType: 1,// 1支付宝，2微信
+                rentTime: 0
+            },
+        },
+        methods: {
+            initData() {
+
+            },
+            payOrders() {
+                console.log(JSON.stringify(this.orders));
+                if (this.orders.payType == 1) {// 支付宝
+                    this.aliPayOrders();
+                } else {// 微信
+                    this.wxPayOrders();
+                }
+            },
+            aliPayOrders() {
+                var that = this;
+                ajaxPost('/alipay/getDepositPayInfo', {
+                    goodsOrdersId: that.ordersDetail.id,
+                    goodsTitle: that.ordersDetail.goods.title,
+                    totalAmount: that.ordersDetail.deposit + ''
+                }, function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            var aliPayPlus = api.require('aliPayPlus');
+                            var sign = ret.data.sign;
+                            var ordersId = ret.data.ordersId;
+                            aliPayPlus.payOrder({
+                                orderInfo: sign
+                            }, function(ret, err) {
+                                if (ret.code == '9000') {
+                                    api.openWin({
+                                        name: 'rent_out_list',
+                                        url: './rent_out_list.html',
+                                        pageParam: {
+                                            tabIndex: 4
+                                        },
+                                        reload: true
+                                    });
+                                } else {
+                                    api.alert({
+                                       title: '支付结果',
+                                       msg: '支付未完成',
+                                       buttons: ['确定']
+                                    });
+                                }
+                            });
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            wxPayOrders() {
+                var that = this;
+                ajaxPost('/wxpay/doDepositUnifiedOrder', {
+                    goodsOrdersId: that.ordersDetail.id,
+                    goodsId: that.ordersDetail.goodsId,
+                    goodsTitle: that.ordersDetail.goods.title,
+                    totalAmount: that.ordersDetail.deposit + ''
+                }, function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            var data = ret.data;
+                            var localOrdersId = data.ordersid;// 注意小写
+                            var wxPay = api.require('wxPay');
+                            wxPay.payOrder({
+                               apiKey: '',
+                               orderId: data.prepayid,
+                               mchId: data.partnerid,
+                               nonceStr: data.noncestr,
+                               timeStamp: data.timestamp,
+                               package: data.package,
+                               sign: data.sign
+                            }, function(ret, err) {
+                                // console.log('wxpay ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                                if (ret.status) {
+                                    api.openWin({
+                                        name: 'rent_out_list',
+                                        url: './rent_out_list.html',
+                                        pageParam: {
+                                            tabIndex: 4
+                                        },
+                                        reload: true
+                                    });
+                               } else {
+                                   if (err.code == -2) {// 取消支付
+                                       api.alert({
+                                          title: '支付结果',
+                                          msg: '支付未完成',
+                                          buttons: ['确定']
+                                       });
+                                   } else {
+                                       api.alert({
+                                            title: '异常',
+                                            msg: JSON.stringify(err),
+                                       }, function(ret, err) {
+                                       });
+                                   }
+                               }
+                            });
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            }
+
+        }
+    })
+
+</script>
+
+</html>

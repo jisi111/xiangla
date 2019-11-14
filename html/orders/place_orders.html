@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        .goods-body{
+          background-color: var(--theme-light-grey);
+          overflow: hidden;
+          color:var(--theme-black);
+        }
+      .goods-name{
+        font-size: 0.7rem;
+        margin-top: 0rem;
+        background-color: var(--theme-color);
+        overflow: hidden;
+        padding-bottom: 0.25rem;
+      }
+      .goods-name>img{
+        width:4.35rem;
+        height:4.35rem;
+        margin-left: 0.65rem;
+        margin-top: 0.75rem;
+        vertical-align: center;
+        float: left;
+      }
+      .goods-name>.goods-reason{
+        margin-top: 0.75rem;
+        padding-left: 0.35rem;
+        height: 1.92rem;
+        color:var(--theme-black);
+        font-size:  0.7rem;
+        margin-right: 0.65rem;
+      }
+      .goods-name>.goods-price{
+        margin-top: 0.65rem;
+        margin-left:0.45rem;
+        font-size:1.22rem;
+        color:#FF4081;
+        overflow: hidden;
+
+      }
+      .goods-price>.old-price{
+        font-size: 0.87rem;
+        text-decoration: line-through;
+        color: #9e9e9e;
+        margin-left:  0.5rem;
+      }
+      .goods_areas,.goods_money{
+        margin-top:  0.5rem;
+        background-color: var(--theme-color);
+        overflow: hidden;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+      .goods_areas{
+        position: relative;
+      }
+      .img-area{
+        width:1.3rem;
+        height:1.3rem;
+        margin-left: 0.65rem;
+      }
+      .goods_areas>p{
+        margin-left:2.5rem;
+        font-size:0.61rem;
+        height:0.85rem;
+        color: var(--theme-black);
+      }
+      .goods_user>span{
+        margin-left:1rem;
+      }
+      .goods-more{
+        height:0.85rem;
+        width:0.85rem;
+        position: absolute;
+        right:  0.5rem;
+        top:40%;
+      }
+      .goods_money>p{
+        font-size:1rem;
+        margin-left: 0.65rem;
+        color: var(--theme-black);
+      }
+      .goods_money>p>span{
+          float: right;
+          margin-right: 0.65rem;
+          color: #FF4081 ;
+        }
+        .goods_pay{
+          margin-top:  0.5rem;
+          background-color: var(--theme-color);
+          overflow: hidden;
+          padding-top: 0.75rem;
+        }
+        .goods_pay>.choose{
+            padding-left: 0.65rem;
+            font-size: 0.87rem;
+            padding-bottom:  0.5rem;
+            border-bottom: 1px solid #F4F4F4;
+            color:var(--theme-black);
+          }
+        .goods_pay>.pay-kind{
+          padding-top: 0.75rem;
+          padding-left: 0.65rem;
+          font-size:0.9rem;
+          line-height:1.1rem;
+            color:var(--theme-black);
+        }
+        .goods_pay>.pay-kind>img{
+          width:1.1rem;
+          height:1.1rem;
+          vertical-align: top;
+          float: left;
+          margin-right: 0.65rem;
+        }
+          .goods_pay>.pay-kind>input{
+            float: right;
+            margin-right: 0.65rem;
+          }
+          .goods_pay>.first-ch{
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #F4F4F4;
+          }
+          .pay_sum{
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            border-top: 1px solid #F4F4F4;
+          }
+          .pay_sum>p{
+            color: var(  --theme-black);
+            margin-top:0.55rem;
+            font-size:0.9rem;
+            padding-left: 0.65rem;
+            height:1.75rem;
+            line-height:1.75rem;
+
+          }
+          .pay_sum>p>span{
+            margin-left: 0.25rem;
+            color:#FF4081;
+          }
+          .pay_sum .button{
+            margin-top:0.55rem;
+            font-size:  0.7rem;
+              padding: 0.3rem 0.65rem;
+            background-color: #FFDD00;
+            margin-right: 0.65rem;
+            border-radius:  0.5rem;
+          }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header id='header' class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <!--  从这开始-->
+    <div class="goods-body">
+      <!-- 商品名称 -->
+      <div class="goods-name">
+        <img :src="goodsDetail.cover" >
+        <p class="goods-reason aui-ellipsis-2" v-text='goodsDetail.title'></p>
+        <p class="goods-price" >
+            <span v-text='"￥" + goodsDetail.price'></span>
+            <span v-if='goodsDetail.tradeType == 2' class="old-price"v-text='"￥" + goodsDetail.orgPrice'></span>
+        </p>
+      </div>
+        <div class="flex-row goods_areas" @click='gotoEditAddress' style="align-items: center; background-color: var(--theme-color);">
+          <img src="../../image/area.png" class="img-area" >
+          <div class="flex-col" style="margin-left:0.87rem;">
+            <div class="flex-row">
+              <div style="color:var(--theme-black);font-size:0.61rem;"v-text='userInfo.contactName'></div>
+              <div style="color:var(--theme-black);font-size:0.61rem;margin-left:0.78rem;"v-text='userInfo.contactPhone'></div>
+            </div>
+            <div class="flex-row" style="color:var(--theme-black);font-size:0.61rem;">
+              <span style="margin-right:0.40rem;"v-text='userInfo.provinceName'></span>
+              <span  style="margin-right:0.40rem;"v-text='userInfo.cityName'></span>
+              <span  style="margin-right:0.40rem;"v-text='userInfo.districtName'></span>
+              <span  style="margin-right:0.40rem;"v-text='userInfo.contactAddress'></span>
+            </div>
+          </div>
+          <!-- <i class="aui-iconfont aui-icon-right  goods-more" style="font-size: 0.8rem;"></i> -->
+          <div class="flex-1"></div>
+          <img src="../../image/grey_go.png" alt=""style="width:0.87rem;height:0.87rem;margin-right:0.43rem;">
+        </div>
+        <div class="grey-line" style="height: 0.5rem;"></div>
+
+        <!-- 出租类型 -->
+        <div class="" style="width: 100%; " v-if='goodsDetail.tradeType == 1'>
+            <div class="flex-row base-padding" style="height: 2rem; align-items: center; font-size: 0.7rem; background-color: white;">
+                <span>月租</span>
+                <div class="" style="margin-left: auto; color: var(--theme-red);">
+                    <span>￥</span>
+                    <span v-text='goodsDetail.price'></span>
+                </div>
+            </div>
+            <div class="grey-line"></div>
+
+            <div class="flex-row base-padding" style="height: 2rem; align-items: center; font-size: 0.7rem; background-color: white;">
+                <span>租期</span>
+                <div class="" style="margin-left: auto; ">
+                    <span v-text='orders.rentTime'></span>
+                    <span>个月</span>
+                </div>
+            </div>
+            <div class="grey-line"></div>
+
+            <div class="flex-row base-padding" style="height: 2rem; align-items: center; font-size: 0.7rem; background-color: white;">
+                <span>起租期</span>
+                <div class="" style="margin-left: auto; ">
+                    <span v-text='orders.rentStartTime'></span>
+                </div>
+            </div>
+            <div class="grey-line"></div>
+
+            <div class="flex-row base-padding" style="height: 2rem; align-items: center; font-size: 0.7rem; background-color: white;">
+                <span>结束期</span>
+                <div class="" style="margin-left: auto; ">
+                    <span v-text='orders.rentEndTime'></span>
+                </div>
+            </div>
+            <div class="grey-line"></div>
+
+            <div class="flex-row base-padding" style="height: 2rem; align-items: center; font-size: 0.7rem; background-color: white;">
+                <span>押金</span>
+                <div class="" style="margin-left: auto; ">
+                    <span v-text='goodsDetail.deposit'></span>
+                </div>
+            </div>
+            <div class="grey-line"></div>
+        </div>
+
+          <!-- 订单总额 -->
+        <div class="goods_money">
+          <p>订单总额 <span v-text='"￥" + orders.totalAmount'></span></p>
+        </div>
+        <!-- 支付方式 -->
+        <div class="goods_pay" style="">
+          <p class="choose">选择支付方式</p>
+          <p class="pay-kind first-ch">
+              <img src="../../image/pay.png" alt="支付宝">
+                <label for="pay">支付宝</label>
+            <input type="radio" name="pay" class="aui-radio" id='pay' v-model="orders.payType" value='1' >
+          </p>
+          <p class="pay-kind last-ch">
+              <img src="../../image/wx.jpg" alt="微信">
+              <label for="pay">微信支付</label>
+            <input type="radio" name="pay" class="aui-radio" id='pay' v-model="orders.payType" value='2'>
+          </p>
+        </div>
+
+        <!-- 底部栏高度占位 -->
+        <div class="" style="background-color: white; height: 6rem;"></div>
+
+        <div class="pay_sum flex-row" style="z-index: 999; background-color: white;">
+          <p>合计 <span v-text='"￥" + orders.totalAmount'></span></p>
+          <div class="flex-1"></div>
+            <!-- <input class='button' type="button" @click='payOrders' value="确认下单"> -->
+            <span class="button" style="color:var(--theme-black); margin-bottom:0.55rem;" @click='payOrders' >确认下单</span>
+
+        </div>
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.goodsDetail = params.goodsDetail;
+        console.log('goodsDetail ' + JSON.stringify(vm.goodsDetail));
+        vm.orders.rentTime = params.buyerRentTime;
+        if (params.isOldOrders != undefined) {
+            vm.isOldOrders = params.isOldOrders;// 是否支付未完成的订单
+        }
+        if (params.oldOrdersId != undefined) {
+            vm.oldOrdersId = params.oldOrdersId;
+        }
+        vm.initData();
+
+        api.addEventListener({
+            name:'viewappear'
+        }, function(ret, err){
+            vm.userInfo = $api.getStorage('userInfo');
+        })
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '确认订单',
+            isOldOrders: false,// 新订单还是未完成支付的旧订单
+            oldOrdersId: '',
+            goodsDetail: {},
+            userInfo: {
+                contactName: '李小姐',
+                phone: '15800001000',
+                provinceName: '广东省',
+                cityName: '珠海市',
+                districtName: '香江区',
+                address: '景秀江南8栋1单元'
+            },
+            orders: {
+                payType: 1,// 1支付宝，2微信
+                rentTime: 0,
+                rentStartTime: '',
+                rentEndTime: ''
+            },
+        },
+        methods: {
+            initData() {
+                this.userInfo = $api.getStorage('userInfo');
+                console.log('userInfo ' + JSON.stringify(this.userInfo));
+                if (this.goodsDetail.tradeType == 1) {// 租
+                    console.log(this.goodsDetail.price + ' ' + this.orders.rentTime);
+                    this.orders.totalAmount = this.goodsDetail.price * this.orders.rentTime;
+                    console.log('===' + this.orders.totalAmount);
+                    this.orders.totalAmount += this.goodsDetail.deposit;
+                    this.orders.totalAmount = Math.round(this.orders.totalAmount * 100) / 100;
+                    console.log('===' + this.orders.totalAmount);
+                    this.getRentStartTime();
+                    this.getRentEndTime();
+                } else {// 售
+                    this.orders.totalAmount = this.goodsDetail.price;
+                    this.orders.totalAmount = Math.round(this.orders.totalAmount * 100) / 100;
+                }
+
+                // 邮费
+                if (this.goodsDetail.isShipFree == 0) {
+                    this.orders.totalAmount += this.goodsDetail.shipAmount;
+                    this.orders.totalAmount = Math.round(this.orders.totalAmount * 100) / 100;
+                }
+            },
+            gotoEditAddress() {
+                api.openWin({
+                    name: 'user_address',
+                    url: '../user/user_address.html',
+                    reload: true
+                });
+            },
+            getRentStartTime() {
+                var day2 = new Date();
+                var y = day2.getFullYear();
+                var m = (day2.getMonth() + 1) < 10 ? '0' + (day2.getMonth() + 1) : (day2.getMonth() + 1);
+                var d = day2.getDate() < 10 ? '0' + day2.getDate() : day2.getDate();
+                this.orders.rentStartTime = y + '/' + m + '/' + d;
+            },
+            getRentEndTime() {
+                var that = this;
+                var params = {
+                    startTime: that.orders.rentStartTime,
+                    number: that.orders.rentTime
+                }
+                console.log(JSON.stringify(params));
+                ajaxPost('/orders/addMonth', params, function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.orders.rentEndTime = ret.data;
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            payOrders() {
+                console.log(JSON.stringify(this.orders));
+                if (this.orders.payType == 1) {// 支付宝
+                    this.aliPayOrders();
+                } else {// 微信
+                    this.wxPayOrders();
+                }
+            },
+            aliPayOrders() {
+                var that = this;
+                var params = {
+                    goodsId: that.goodsDetail.id,
+                    goodsTitle: that.goodsDetail.title,
+                    totalAmount: that.orders.totalAmount + '',
+                    rentTime: that.orders.rentTime,
+                    isOldOrders: that.isOldOrders ? '1' : '0',
+                    oldOrdersId: that.oldOrdersId
+                };
+                console.log(JSON.stringify(params));
+                ajaxPost('/alipay/getPayInfo', params, function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            var aliPayPlus = api.require('aliPayPlus');
+                            var sign = ret.data.sign;
+                            var ordersId = ret.data.ordersId;
+                            aliPayPlus.payOrder({
+                                orderInfo: sign
+                            }, function(ret, err) {
+                                if (ret.code == '9000') {
+                                    // api.alert({
+                                    //    title: '支付结果',
+                                    //    msg: '成功',
+                                    //    buttons: ['确定']
+                                    // });
+                                    api.openWin({
+                                        name: 'pay_result',
+                                        url: './pay_result.html',
+                                        pageParam: {
+                                            ordersId: ordersId,
+                                            totalAmount: that.orders.totalAmount,
+                                            payType: that.orders.payType,
+                                            tradeType: that.goodsDetail.tradeType,
+                                            isSuccess: true
+                                        },
+                                        reload: true
+                                    });
+                                } else {
+                                    api.openWin({
+                                        name: 'pay_result',
+                                        url: './pay_result.html',
+                                        pageParam: {
+                                            ordersId: ordersId,
+                                            totalAmount: that.orders.totalAmount,
+                                            payType: that.orders.payType,
+                                            tradeType: that.goodsDetail.tradeType,
+                                            isSuccess: false
+                                        },
+                                        reload: true
+                                    });
+                                }
+                            });
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            wxPayOrders() {
+                var that = this;
+                ajaxPost('/wxpay/doUnifiedOrder', {
+                    goodsId: that.goodsDetail.id,
+                    goodsTitle: that.goodsDetail.title,
+                    totalAmount: that.orders.totalAmount + '',
+                    rentTime: that.orders.rentTime,
+                    isOldOrders: that.isOldOrders ? '1' : '0',
+                    oldOrdersId: that.oldOrdersId
+                }, function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            var data = ret.data;
+                            var localOrdersId = data.ordersid;// 注意小写
+                            var temp = {
+                               apiKey: '',
+                               orderId: data.prepayid,
+                               mchId: data.partnerid,
+                               nonceStr: data.noncestr,
+                               timeStamp: data.timestamp,
+                               package: data.package,
+                               sign: data.sign
+                            }
+                            console.log(JSON.stringify(temp));
+                            var wxPay = api.require('wxPay');
+                            wxPay.payOrder({
+                               apiKey: '',
+                               orderId: data.prepayid,
+                               mchId: data.partnerid,
+                               nonceStr: data.noncestr,
+                               timeStamp: data.timestamp,
+                               package: data.package,
+                               sign: data.sign
+                            }, function(ret, err) {
+                                // console.log('wxpay ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                                if (ret.status) {
+                                   api.openWin({
+                                       name: 'pay_result',
+                                       url: './pay_result.html',
+                                       pageParam: {
+                                           ordersId: localOrdersId,
+                                           totalAmount: that.orders.totalAmount,
+                                           payType: that.orders.payType,
+                                           tradeType: that.goodsDetail.tradeType,
+                                           isSuccess: true
+                                       },
+                                       reload: true
+                                   });
+                               } else {
+                                   if (err.code == -2) {// 取消支付
+                                       api.openWin({
+                                           name: 'pay_result',
+                                           url: './pay_result.html',
+                                           pageParam: {
+                                               ordersId: localOrdersId,
+                                               totalAmount: that.orders.totalAmount,
+                                               payType: that.orders.payType,
+                                               tradeType: that.goodsDetail.tradeType,
+                                               isSuccess: false
+                                           },
+                                           reload: true
+                                       });
+                                   } else {
+                                       api.alert({
+                                            title: '异常',
+                                            msg: JSON.stringify(err),
+                                       }, function(ret, err) {
+                                       });
+                                   }
+                               }
+                            });
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            }
+        }
+    })
+
+</script>
+
+</html>

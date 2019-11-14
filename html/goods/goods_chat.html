@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <style>
+        .btn-bg {
+            border-radius: 0.25rem;
+            color: white;
+            font-size: 0.8rem;
+            text-align: center;
+            width: 3rem;
+            height: 1.3rem;
+        }
+        .buy-btn {
+            border-radius: 0.25rem;
+            color: white;
+            font-size: 0.7rem;
+            text-align: center;
+            width: 3rem;
+            height: 1.3rem;
+            line-height: 1.3rem;
+        }
+
+        .chat_div {
+            /*display: flex;
+        flex-direction: column;*/
+            /*position: fixed;*/
+            /*bottom: 0;*/
+            width: 100%;
+            padding: 0.5rem 0.9rem 0.45rem 0.65rem;
+            border-top: 1px solid #F4F4F4;
+        }
+
+        input[type=text] {
+            margin-left: 0.8rem;
+            border-radius: 1.5rem;
+            border-color: var(--theme-light-grey);
+            background-color: var(--theme-light-grey);
+        }
+
+        input[type=text]:focus {
+            margin-left: 0.8rem;
+            background-color: var(--theme-light-grey);
+            border-color: var(--theme-light-grey);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="flex-col" style="height: 100%; ">
+        <!-- 商品展示 -->
+        <div class="flex-row" style="background-color:white;padding: 0.65rem;"
+            v-if='goodsDetail != undefined && goodsDetail.id != 0'>
+            <img :src="goodsDetail.cover" style="width: 3.25rem; height: 3.25rem; margin-right: 0.45rem;border-radius: 0.25rem;">
+            <div class="flex-col " style="">
+                <span class="ellipsis" v-text='goodsDetail.title' style="width: 7.54rem; height: 1.75rem;font-size: 0.61rem; padding-top: 0.25rem; ">因工作原因要出国，因此忍痛转让一手买的...</span>
+                <span style=" color: red;  margin-top: 0.25rem" v-text='goodsDetail.price'>￥30000</span>
+            </div>
+            <div class="flex-1"></div>
+            <div class="buy-btn" @click='buyGoods'
+                style="background-color: #E4007F; margin-top: 1.2rem; font-size: 0.7rem;">马上买</div>
+        </div>
+        <div class='grey-line' style="height: 0.15rem; " v-if='goodsDetail != undefined && goodsDetail.id != 0'></div>
+
+        <!-- 聊天内容 -->
+        <div style="background-color:white; width:100%; flex: 1; overflow: auto; padding-bottom: 3rem; ">
+            <section class="aui-chat">
+                <div class="" style="width: 100%; " v-for='(item, index) in chatList'>
+                    <div class="aui-chat-header" v-text='getFormatTime(item)' v-if='index % 5 == 0'></div>
+                    <div class="aui-chat-item aui-chat-left" v-if='item.messageDirection != "SEND"'>
+                        <div class="aui-chat-media">
+                            <img v-if='item.extraInfo' :src="item.extraInfo.senderImage" />
+                        </div>
+                        <div class="aui-chat-inner">
+                            <div class="aui-chat-content" >
+                                <div class="aui-chat-arrow"></div>
+                                <div class="" v-text='item.content.text'></div>
+                            </div>
+                            <div class="aui-chat-status aui-chat-status-refresh"></div>
+                        </div>
+                    </div>
+                    <div class="aui-chat-item aui-chat-right" v-if='item.messageDirection == "SEND"'>
+                        <div class="aui-chat-media">
+                            <img v-if='item.extraInfo' :src="item.extraInfo.senderImage" />
+                        </div>
+                        <div class="aui-chat-inner" >
+                            <div class="aui-chat-content" >
+                                <div class="aui-chat-arrow"></div>
+                                <div class="" v-text='item.content.text'></div>
+                            </div>
+                            <div class="aui-chat-status">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- <div class='grey-line' style="height: 0.15rem; "></div> -->
+
+        <!-- 聊天内容输入 -->
+        <div class="chat_div" style="background-color:white; position: fixed; bottom: 0; ">
+            <div class="flex-row" style="align-items: center;">
+                <input id='inputLine' v-model='inputMsg' type="text" placeholder="请输入聊天内容"
+                    style="margin-right: 0.75rem;text-align: left; height: 1.75rem; line-height: 1.75rem; padding-left: 0.5rem;" />
+                <div @click='sendMsg' style="width: 4rem; height: 1.3rem;border-radius: 0.75rem; background-color: #E4007F; color:#FFFFFF;font-size: 0.8rem; text-align:center;line-height: 1.3rem;">
+                    发送
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js"></script>
+<script type="text/javascript" src="../../script/aui-toast.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var rong;
+
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.targetId = params.targetId + '';
+        vm.goodsDetail = params.goodsDetail;
+        // console.log(JSON.stringify(vm.goodsDetail));
+
+        rong = api.require('rongCloud2');
+
+        vm.initData();
+
+        api.setCustomRefreshHeaderInfo({
+            bgColor: '#eee',
+            images : ['widget://image/dropdown_anim_00.png', 'widget://image/dropdown_anim_01.png', 'widget://image/dropdown_anim_02.png', 'widget://image/dropdown_anim_03.png', 'widget://image/dropdown_anim_04.png', 'widget://image/dropdown_anim_05.png', 'widget://image/dropdown_anim_06.png','widget://image/dropdown_anim_07.png','widget://image/dropdown_anim_08.png','widget://image/dropdown_anim_09.png','widget://image/dropdown_anim_10.png'],
+            tips: {
+                pull: '下拉刷新',
+                threshold: '下拉刷新',
+                load: '正在刷新'
+            }
+        }, function() {
+            vm.getHistoryList();
+        });
+
+        api.addEventListener({
+            name: 'newMsgReceive'
+        }, function(ret, err) {
+            console.log('newMsgReceive ' + JSON.stringify(ret.value));
+            if (ret.value.senderUserId == vm.targetId) {
+                console.log('chat page getChatList');
+                vm.getChatList();
+                vm.clearUnreadStatus();
+            }
+        });
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+            showGoods: false,
+            userId: '0',
+            targetId: '0',
+            userInfo: {},
+            chatList: [],
+            inputMsg: '',
+            goodsDetail: {
+                id: 0,
+                title: '',
+                price: 0.00
+            },
+            oldestMessageId: -1,
+        },
+        methods: {
+            initData() {
+                this.userId = $api.getStorage('userId') + '';
+                this.userInfo = $api.getStorage('userInfo');
+                this.getChatList();
+                this.clearUnreadStatus();
+            },
+            clearUnreadStatus() {
+                var that = this;
+                rong.getUnreadCount({
+                    conversationType: 'PRIVATE',
+                    targetId: that.targetId
+                }, function(ret, err) {
+                    console.log('getUnreadCount ' + JSON.stringify(ret));
+                    if (ret.status == 'success') {
+                        if (ret.result > 0) {
+                            api.sendEvent({
+                                name: 'subChatNewMsgNum',
+                                extra: {
+                                    num: ret.result,
+                                    targetId: that.targetId
+                                }
+                            });
+                        }
+                    }
+                    rong.clearMessagesUnreadStatus({
+                        conversationType: 'PRIVATE',
+                        targetId: that.targetId
+                    }, function(ret, err) {
+                        console.log('clearMessagesUnreadStatus ' + JSON.stringify(ret));
+                    })
+                })
+            },
+            buyGoods() {
+                api.openWin({
+                    name: 'goods_buy',
+                    url: './goods_buy.html',
+                    pageParam: {
+                        goodsDetail: this.goodsDetail
+                    }
+                });
+            },
+            getFormatTime(item) {
+                return timeDiff(item.receivedTime);
+            },
+            getHistoryList() {
+                var that = this;
+                console.log('oldestMessageId ' + that.oldestMessageId);
+                rong.getHistoryMessages({
+                    conversationType: 'PRIVATE',
+                    targetId: that.targetId,
+                    oldestMessageId: that.oldestMessageId,
+                    count: 10
+                }, function(ret, err) {
+                    console.log('getHistoryMessages ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                    // 逆序
+                    var tempList = [];
+                    for (var i = ret.result.length - 1; i >= 0; i--) {
+                        var item = ret.result[i];
+                        if (item.content.extra) {
+                            var extraInfo = JSON.parse(item.content.extra);
+                            that.$set(ret.result[i], 'extraInfo', extraInfo);
+                        }
+                        tempList.push(item);
+                    }
+                    console.log(JSON.stringify(tempList));
+                    tempList.push.apply(tempList, that.chatList);// 加到现有数据顶部
+                    that.chatList = tempList;// 现有数据重新赋值
+
+                    if (that.chatList.length > 0) {
+                        that.oldestMessageId = that.chatList[0].messageId;
+                    }
+                    api.pageUp(function( ret, err ){});
+
+                    api.refreshHeaderLoadDone();
+                })
+            },
+            getChatList() {
+                var that = this;
+                rong.getLatestMessages({
+                    conversationType: 'PRIVATE',
+                    targetId: that.targetId,
+                    count: 10
+                }, function(ret, err) {
+                    console.log('+++++++++++++getMessages ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                    if (ret.status == 'success') {
+                        console.log('========length ' + ret.result.length);
+                        // 逆序
+                        var tempList = [];
+                        for (var i = ret.result.length - 1; i >= 0; i--) {
+                            var item = ret.result[i];
+                            var extraInfo = JSON.parse(item.content.extra);
+                            that.$set(ret.result[i], 'extraInfo', extraInfo);
+                            tempList.push(item);
+                        }
+                        console.log(JSON.stringify(tempList));
+                        that.chatList = tempList;
+
+                        if (that.chatList.length > 0) {
+                            that.oldestMessageId = that.chatList[0].messageId;
+                        }
+                        api.pageDown({bottom:true},function(ret, err) {
+                            if (!ret.scrolled) {
+                            }
+                        });
+                    }
+                })
+            },
+            sendMsg() {
+                var that = this;
+                // 输入法不隐藏
+                $api.dom('#inputLine').focus();
+
+                var extraInfo = {
+                    senderName: that.userInfo.nickName,
+                    senderImage: that.userInfo.image
+                }
+                console.log('targetId ' + that.targetId);
+                rong.sendTextMessage({
+                    conversationType: 'PRIVATE',
+                    targetId: that.targetId,
+                    text: that.inputMsg,
+                    extra: JSON.stringify(extraInfo)
+                }, function(ret, err) {
+                    console.log('rongCloud sendMsg ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                    if (ret.status == 'success') {
+                        console.log('rongCloud sendMsg success');
+                        that.inputMsg = '';
+                        that.getChatList();
+                    } else if (ret.status == 'error') {
+                        api.toast({
+                            msg: err.code,
+                            duration: 2000,
+                            location: 'middle'
+                        });
+                    }
+                });
+            },
+
+        }
+    })
+</script>
+
+</html>

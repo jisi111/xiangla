@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板-下拉刷新</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        html,
+        body {
+            width: 100%;
+            background-color: transparent;
+        }
+        .father{
+            padding-bottom: 15px;
+            position: relative;
+            border-left: 1px solid #deaaf7;
+            padding-left:10px;
+
+          }
+          .circle{
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color:#deaaf7;
+            position: absolute;
+            left: -6px;
+          }
+          p{
+            font-size: 12px;
+          }
+    </style>
+</head>
+<body>
+    <div id="app" >
+        <div class="" style="height: 1px;">
+        </div>
+        <div class="" style="background-color:white;width:85%;hright:60%;margin: 9rem auto;border-radius:15px;">
+            <div class="" style="padding: 35px 40px;text-align:center;font-size: 0.7rem;border-bottom: 1px solid #F4F4F4;">
+                结束期前5天才可以退还押金
+            </div>
+            <div style="margin-top:20px; padding:0 90px 0 35PX;border-bottom:1px solid #F4F4F4">
+            <div class="father">
+              <div class="circle"></div>
+              <p>到期</p>
+            </div>
+            <div class="father">
+              <div class="circle"></div>
+              <p>东家将押金退还至平台暂管</p>
+            </div>
+            <div class="father">
+              <div class="circle"></div>
+              <p>平台收到押金，通知租户退还乐器</p>
+            </div>
+            <div class="father">
+              <div class="circle"></div>
+              <p>东家收到退还乐器</p>
+            </div>
+            <div class="father" style="border-left:none;">
+              <div class="circle"></div>
+              <p>平台将押金打入租户绑定的微信或支付宝账号</p>
+            </div>
+          </div>
+            <div class="" style="padding: 0.87rem 2.19rem 0.87rem 2.19rem;text-align:center;">
+                <span style="background-color:red;width:40%;height: 2rem;border-radius:30px;line-height: 2rem;color:white;"
+                    @click='applyReturnDeposit'>确认</span>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.ordersId = params.ordersId;
+
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板Frame',
+            ordersId: '',
+        },
+        methods: {
+            applyReturnDeposit() {
+                ajaxPost('/orders/applyReturnDeposit', this.ordersId, function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            api.toast({
+                                msg: '申请成功',
+                                location: 'middle'
+                            });
+                            api.execScript({
+                                name: 'rent_in_list',
+                                script: 'refreshData()'
+                            });
+                            api.closeFrame();
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+
+        }
+    })
+
+</script>
+
+</html>

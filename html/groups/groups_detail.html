@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <style>
+        .center_header {
+            background: url('../../image/user-page-cover.png') no-repeat;
+            overflow: hidden;
+            height: 8.75rem;
+            padding-left: 0.85rem;
+            position: relative;
+        }
+
+        .center_header .return {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .center_header .camera {
+            width: 1.3rem;
+            height: 1.3rem;
+            margin-top: 0.9rem;
+        }
+
+        .center_header .change {
+            display: inline-block;
+            margin:0.9rem 0.87rem 0 0.95rem;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.6rem;
+            border-radius: 1.5rem;
+            background-color: var(--theme-color);
+            color: #9e9e9e;
+        }
+
+        .center_header .head {
+            height: 3rem;
+            width: 3rem;
+            border: 0.2rem solid #ffffff;
+            border-radius: 50%;
+            margin-top: 1.6rem;
+
+        }
+
+        .center_header h1 {
+            position: absolute;
+            font-size: 1.1rem;
+            color: var(--theme-color);
+            top: 4.2rem;
+            left: 4.7rem;
+        }
+
+        .center_header p {
+            position: absolute;
+            top: 5.75rem;
+            left: 4.7rem;
+            color: var(--theme-color);
+            font-size: 0.6rem;
+        }
+
+        .center_body {
+            z-index: 10;
+            width: 100%;
+            position: absolute;
+            top: 9.35rem;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            margin: auto;
+            width: 18rem;
+            border-radius: 0.65rem;
+            background-color: var(--theme-color);
+            padding: 0 0.85rem;
+            padding-top: 1.2rem;
+
+        }
+
+        .center_body>div {
+            height: 3.2rem;
+            overflow: hidden;
+        }
+
+        .center_body .people {
+            height: 2.75rem;
+            height: 2.4rem;
+            margin-bottom: 1.8rem;
+            float: left;
+        }
+
+        .center_body .dimond {
+            margin-top: 0.1rem;
+            height: 2.25rem;
+            width: 2.6rem;
+            margin-left: 0.75rem;
+            float: left;
+        }
+
+        .center_body>.photo {
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            vertical-align: -40%;
+        }
+
+        .center_body>.begin {
+            display: inline-block;
+            height: 2.15rem;
+            width: 2.15rem;
+            vertical-align: -60%;
+        }
+
+        .center_body>span {
+            margin: 0 0.25rem;
+        }
+
+        .center_body>.recommend {
+            color: var( --theme-black);
+            margin-top: 0.25rem;
+        }
+
+        .center_body>.talk {
+            color: var( --theme-black);
+            padding: 1.25rem 0 0.75rem;
+            border-bottom: 1px solid #f4f4f4;
+        }
+
+        .condition {
+            color：var( --theme-black);
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header class="">
+            <div class="center_header">
+              <div class="flex-row">
+                <img src="../../image/gray-back.png" class="return" @click='goBack'>
+                <div class="flex-1"></div>
+                <img src="../../image/camera.png" class="camera">
+                <div @click='change' class='change'>修改资料</div>
+              </div>
+
+                <img src="../../image/group-cover-01.png" class="head">
+                <h1 v-text='item.name'></h1>
+                <p>302人气·3动态</p>
+            </div>
+        </header>
+        <!--高度至少1px才能有效偏移-->
+        <div id='first-el' style="height: 1px; "></div>
+        <div class="center_body" style="width:100%;
+        ">
+            <div class="red">
+                <img src="../../image/people.png" alt="" class="people">
+                <img src="../../image/diamond.png" alt="" class="dimond">
+            </div>
+            <img src="../../image/person.png" alt="" class="photo">
+            <span>SHELDK丽人</span>
+            <img src="../../image/initiator.png" alt="" class="begin">
+            <p class='recommend' v-text='item.sign'></p>
+            <p class="talk" v-text='item.introduction'></p>
+
+            <!-- 动态页面 -->
+            <h1 class='condition'>动态</h1>
+            <div class="flex-row " style="align-items: center; margin-top: 0.85rem;">
+                <img src="../../image/user-photo.png" style="width: 2.15rem; height: 2.15rem; border-radius: 50%; ">
+                <div class="flex-col" style="margin-left: 0.5rem; ">
+                    <span style="font-size: 0.7rem; ">小妞妈妈</span>
+                    <span style="font-size: 0.6rem; color: var(--theme-grey); ">1小时前</span>
+                </div>
+                <div class="" style="flex: 1;"></div>
+            </div>
+            <div class="" style="font-size: 0.8rem; margin-top: 0.75rem; ">
+                <div class="">
+                    不清老师的原因有三：降低成本。既包括钱，也包括时间。因为给孩子安排的课比较多
+                </div>
+            </div>
+            <div class="flex-row" style="justify-content: space-between; ">
+                <div class="" style="width: 100%;height: 15rem; margin-top: 1rem; ">
+                    <img :src='item.image' style="width: auto; height: auto; max-width: 100%; max-height: 100%;">
+                </div>
+            </div>
+            <div class="" style="margin-top: 0.5rem; width:35%; ">
+                <div class="flex-row" style="color: #1094DD; align-items: center; background-color: #f4f3fb; border-radius: 0.75rem; padding: 0.15rem 0.5rem;">
+                    <img src="../../image/qing.png" style="width: 0.75rem; height: 0.75rem; ">
+                    <span style="margin-left: 0.25rem; font-size: 0.61rem; ">个人闲置乐器</span>
+                </div>
+            </div>
+            <div class="flex-row" style="align-items: center; padding: 1.25rem 0.15rem 0.85rem;  ">
+                <div class="flex-row flex-between" style="width: 60%; ">
+                    <div class="flex-row" style="align-items: center; ">
+                        <img src="../../image/xin.png" style="width: 0.85rem; height: 0.85rem; ">
+                        <span style="margin-left: 0.5rem; font-size: 0.6rem; ">135</span>
+                    </div>
+                    <div class="flex-row" style="align-items: center; ">
+                        <img src="../../image/comment.png" style="width: 0.85rem; height: 0.85rem; ">
+                        <span style="margin-left: 0.5rem; font-size: 0.6rem; ">102</span>
+                    </div>
+                    <div class="flex-row" style="align-items: center; ">
+                        <img src="../../image/collect.png" style="width: 0.85rem; height: 0.85rem; ">
+                        <span style="margin-left: 0.5rem; font-size: 0.6rem; ">20</span>
+                    </div>
+                </div>
+                <div class="flex-1"></div>
+                <img src="../../image/share.png" style="width: 0.85rem; height: 0.85rem; ">
+            </div>
+        </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js"></script>
+<script type="text/javascript" src="../../script/aui-toast.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+            queryParams: {},
+            item:{},
+            recommendList: [],
+        },
+        methods: {
+            initData() {
+              // this.page.current = 1;
+              this.getList();
+            },
+            getList() {
+                var that = this;
+                var params = {
+                    queryParams: that.queryParams,
+                    page: that.page
+                };
+                console.log('params ' + JSON.stringify(params));
+                ajaxPost('/groups/get', '1', function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                          that.item=ret.data;
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+
+            change() {
+                api.openWin({
+                    name: 'modify_data',
+                    url: '../orders/modify_data.html',
+                    pageParam: {
+                        name: 'test'
+                    }
+                });
+            },
+
+        }
+    })
+</script>
+
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app" style="overflow: hidden;">
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <img style="width: 1rem; height: 1rem;" src="../../image/share-grey.png">
+        </a>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="base-padding">
+
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+
+        var dialog = new auiDialog({})
+        dialog.prompt({
+            title:"弹出提示",
+            text:'默认内容',
+            buttons:['取消','确定']
+        },function(ret){
+            if(ret.buttonIndex == 2){
+                var id = ret.text;
+                if (id == '1000') {
+                    vm.myId = 1000;
+                    vm.friendId = 1001;
+                    vm.friend2Id = 1002;
+                } else if (id == '1001') {
+                    vm.myId = 1001;
+                    vm.friendId = 1000;
+                    vm.friend2Id = 1002;
+                } else {
+                    vm.myId = 1002;
+                    vm.friendId = 1001;
+                    vm.friend2Id = 1002;
+                }
+                vm.initData();
+            }
+        })
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+            myId: '',
+            friendId: '',
+            friend2Id: '',
+        },
+        methods: {
+            initData() {
+                var that = this;
+                var agoraLive = api.require('agoraLive');
+                agoraLive.init({
+                    appId: '6054fd315838456cb6ba97091b0ccd8c'
+                }, function(ret) {
+                    if (ret.status) {
+                        alert('初始化成功');
+                        agoraLive.joinChannelByToken({
+                            channelToken: '',
+                            channelId: '1234abcd',
+                            uid: that.myId
+                        }, function(ret, err) {
+                            api.alert({msg:JSON.stringify(ret)});
+                            if (ret.status) {
+                                agoraLive.switchCamera(function(ret) {
+                                        if (ret.status) {
+                                            alert(JSON.stringify(ret));
+                                        }
+                                });
+
+                                agoraLive.initVideoRect({
+                                    uid:0,
+                                       rect: {
+                                        x: 0,
+                                        y: 0,
+                                        w: 320,
+                                        h: 600
+                                    },
+                                    fixedOn: api.frameName
+                                });
+
+                                agoraLive.initVideoRect({
+                                    uid: that.friendId,
+                                       rect: {
+                                        x: 0,
+                                        y: 400,
+                                        w: 160,
+                                        h: 200
+                                    },
+                                    fixedOn: api.frameName
+                                });
+
+                                agoraLive.initVideoRect({
+                                    uid: that.friend2Id,
+                                       rect: {
+                                        x: 180,
+                                        y: 400,
+                                        w: 160,
+                                        h: 200
+                                    },
+                                    fixedOn: api.frameName
+                                });
+
+                                // api.openFrame({
+                                //     name: 'video_ctrl',
+                                //     url: './video_ctrl.html',
+                                //     bgColor: 'rgba(0, 0, 0, 0)',
+                                //     pageParam: {
+                                //     },
+                                //     reload: true
+                                // });
+
+                                agoraLive.enableVideo( function(ret) {
+                                    if (ret.status) {
+                                        alert(JSON.stringify(ret));
+                                        agoraLive.setupLocalVideo( {
+                                                renderMode:'RENDER_MODE_HIDDEN'
+                                        },function(ret) {
+                                                if (ret.status) {
+                                                    // alert(JSON.stringify(ret));
+                                                }
+                                        });
+
+                                        agoraLive.setupRemoteVideo( {
+                                                renderMode: 'RENDER_MODE_HIDDEN',
+                                                uid: that.friendId
+                                        },function(ret) {
+                                                if (ret.status) {
+                                                    // alert(JSON.stringify(ret));
+                                                }
+                                        });
+
+                                        agoraLive.setupRemoteVideo( {
+                                                renderMode: 'RENDER_MODE_HIDDEN',
+                                                uid: that.friend2Id
+                                        },function(ret) {
+                                                if (ret.status) {
+                                                    // alert(JSON.stringify(ret));
+                                                }
+                                        });
+                                    }
+                                });
+                            } else {
+                                api.alert({msg:JSON.stringify(err)});
+                            }
+                        });
+                    }
+                });
+
+            },
+
+        }
+    })
+
+</script>
+
+</html>

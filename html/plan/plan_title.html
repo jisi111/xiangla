@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <!-- <div class="aui-pull-right" style="width: 3.07rem;height: 1.31rem; border-radius: 1.31rem;background-color:#FFCE54;font-size: 0.61rem;color:white;align-items:center;">
+            确定
+        </div> -->
+        <div class="aui-pull-right follow-btn flex-row" @click='updateTitle'
+            style="margin:0.5rem;height:1.31rem;justify-content: center;">确定</div>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="" style="width: 100%; height:10.26rem;">
+        <textarea cols="5" rows="3" maxlength="15" placeholder="赶紧写下你的目标宣言吧！"
+            style="font-size:0.78rem;padding:0.40rem;" v-model='planTitle'></textarea>
+    </div>
+    <div class="grey-line"style="margin-top:5.04rem;"></div>
+    <div class="base-padding" style="color: var(--theme-grey);font-size: 0.61rem; margin-top:0.65rem;">
+        - 限定15个字数 -
+    </div>
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.planId = params.planId;
+        vm.planTitle = params.planTitle;
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '目标宣言',
+            planTitle: '',
+        },
+        methods: {
+            initData() {
+
+            },
+            updateTitle() {
+                var that = this;
+                var params = {
+                    id: that.planId,
+                    title: that.planTitle
+                }
+                console.log(JSON.stringify(params));
+                ajaxPost('/plan/update', params, function(ret,arr){
+                  console.log(JSON.stringify(ret));
+                  if(ret){
+                        if(ret.returnCode == '1'){
+                            api.execScript({
+                               name: 'plan_detail',
+                               script: 'setTitle("' + that.planTitle + '")'
+                            });
+                            api.closeWin();
+                        } else {
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  } else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+
+        }
+    })
+
+</script>
+
+</html>

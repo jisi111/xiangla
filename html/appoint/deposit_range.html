@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+    .button{
+      height: 2.19rem;
+      width: 16.7rem;
+      border-radius: 1.31rem;
+      margin:1.36rem auto;
+      text-align: center;
+      line-height: 2.19rem;
+      color:var(--theme-color);
+      background-color: #3AB2BF ;
+    }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <!-- <img style="width: 1rem; height: 1rem;" src="../../image/share-grey.png"> -->
+        </a>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="base-padding">
+        <!-- <span style="font-size:0.70rem;color:var(--theme-grey);margin-top:1.31rem;">*可多选</span> -->
+      <div class="flex-row" style="border-bottom:1px solid  #F4F4F4;padding: 0.87rem 0 0.87rem 0;" >
+          <label for="pay" style="color:var(--theme-black); font-weight:700">3,000元以内</label>
+          <div class="flex-1">
+          </div>
+          <input type="radio" name="pay" class="aui-radio" id='pay' value='3000' v-model='depositRange'>
+      </div>
+      <div class="flex-row" style="border-bottom:1px solid  #F4F4F4;padding: 0.87rem 0 0.87rem 0;" >
+          <label for="pay" style="color:var(--theme-black); font-weight:700">5,000元以内</label>
+          <div class="flex-1">
+          </div>
+          <input type="radio" name="pay" class="aui-radio" id='pay' value='5000' v-model='depositRange'>
+      </div>
+      <div class="flex-row" style="border-bottom:1px solid  #F4F4F4;padding: 0.87rem 0 0.87rem 0;" >
+          <label for="pay" style="color:var(--theme-black); font-weight:700" v-model='depositRange'>10,000元以内</label>
+          <div class="flex-1">
+          </div>
+          <input type="radio" name="pay" class="aui-radio" id='pay' value='10000' v-model='depositRange'>
+      </div>
+      <div class="flex-row" style="padding-top: 0.92rem; padding-bottom:0.87rem">
+        <label for="pay" style="color:var(--theme-black); font-weight:700">我只租用零押金的</label>
+          <div class="flex-1">
+          </div>
+          <input type="radio" name="pay" class="aui-radio" id='pay' value='0' v-model='depositRange'>
+      </div>
+        <div class="grey-line"></div>
+        <div class='button' @click='certain'>确定</div>
+    </div>
+
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        if (params.depositRange) {
+            vm.depositRange = params.depositRange;
+        }
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板',
+            depositRange: 0,
+        },
+        methods: {
+            initData() {
+
+            },
+            certain(){
+                api.execScript({
+                    name: 'make_appoint',
+                    script: 'setDepositRange(' + this.depositRange + ')'
+                });
+                api.closeWin();
+            },
+        }
+    })
+
+</script>
+
+</html>

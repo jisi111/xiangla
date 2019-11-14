@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="" >
+        <div class="flex-row" style="padding: 1.09rem 0 0.74rem 0">
+            <span style="font-size: 0.7rem; margin-left: 0.61rem;">订单号</span>
+            <div class="flex-1">
+
+            </div>
+            <span style="margin-right:0.61rem" v-text='orders.id'></span>
+        </div>
+        <div class="flex-row" style="font-size: 0.7rem; padding: 1.09rem 0 0.74rem 0;border-top:1px solid #F4F4F4;">
+            <span style="margin-left: 0.61rem;">买家昵称</span>
+            <div class="flex-1"></div>
+            <span style="margin-right:0.61rem" v-text="orders.buyer.nickName"></span>
+        </div>
+        <div class="flex-row" style="padding: 1.09rem 0 0.74rem 0;border-top:1px solid #F4F4F4;">
+            <span style="font-size: 0.7rem; margin-left: 0.61rem;"
+                v-if='orders.tradeType == 1'>租金</span>
+            <span style="font-size: 0.7rem; margin-left: 0.61rem;"
+                v-if='orders.tradeType == 2'>价格</span>
+            <div class="flex-1"></div>
+            <span style="margin-right:0.61rem;color:red" v-text="'￥' + orders.goodsPrice"></span>
+        </div>
+        <div class="flex-row" v-if='orders.tradeType == 1' style="padding: 1.09rem 0 0.74rem 0;border-top:1px solid #F4F4F4;">
+            <span style="font-size: 0.7rem; margin-left: 0.61rem;">租期</span>
+            <span style="margin-right:0.61rem; margin-left: auto;" v-text="orders.rentTime + '个月'"></span>
+        </div>
+        <div class="flex-row" v-if='orders.tradeType == 1' style="padding: 1.09rem 0 0.74rem 0;border-top:1px solid #F4F4F4;">
+            <span style="font-size: 0.7rem; margin-left: 0.61rem;" >租金总额</span>
+            <span style="margin-right:0.61rem;color:red; margin-left: auto;" v-text='totalRent'></span>
+        </div>
+        <div class="flex-row" v-if='orders.tradeType == 1' style="padding: 1.09rem 0 0.74rem 0;border-top:1px solid #F4F4F4;">
+            <span style="font-size: 0.7rem; margin-left: 0.61rem;">押金</span>
+            <span style="margin-right:0.61rem;color:red; margin-left: auto;"
+                v-text="'￥' + orders.deposit"></span>
+        </div>
+        <div class="flex-row" style="border-top:1px solid #F4F4F4;padding: 1.09rem 0 0.74rem 0; align-items:center;">
+            <div class="flex-1"></div>
+            <span style="font-size: 0.7rem; margin-left:">合计</span>
+            <span style="color:red;font-size: 1.22rem;margin-right: 0.61rem;" v-text="'￥' + orders.totalAmount" ></span>
+        </div>
+        <div class="flex-row" v-if='orders.tradeType == 1' style="padding: 1.09rem 0 0.74rem 0;border-top:1px solid #F4F4F4;">
+            <span style="font-size: 0.7rem; margin-left: 0.61rem;">起租期</span>
+            <span style="margin-right:0.61rem; margin-left: auto; "
+                v-if='orders.rentStartTime'
+                v-text="(orders.rentStartTime).substring(0, 10)" ></span>
+        </div>
+        <div class="flex-row" v-if='orders.tradeType == 1' style="padding: 1.09rem 0 0.74rem 0;border-top:1px solid #F4F4F4;">
+            <span style="font-size: 0.7rem; margin-left: 0.61rem;">结束期</span>
+            <span style="margin-right:0.61rem; margin-left: auto;"
+                v-if='orders.rentEndTime'
+                v-text="(orders.rentEndTime).substring(0, 10)"></span>
+        </div>
+        <div class="flex-row" style="font-size: 0.7rem;  padding: 1.09rem 0 0.74rem 0;border-top:1px solid #F4F4F4;">
+            <span style="margin-left: 0.61rem;">支付方式</span>
+            <span style="margin-right:0.61rem; margin-left: auto;" v-if="orders.payType == 1">支付宝</span>
+            <span style="margin-right:0.61rem; margin-left: auto;" v-if="orders.payType == 2">微信支付</span>
+        </div>
+        <div class="flex-row" style="font-size: 0.7rem; padding: 1.09rem 0 0.74rem 0;border-top:1px solid #F4F4F4;">
+            <span style="margin-left: 0.61rem;">交易时间</span>
+            <span style="margin-right:0.61rem; margin-left: auto;" v-text="orders.createTime"></span>
+        </div>
+        <div class="flex-col" style="padding: 1.09rem 0 0.74rem 0; font-size: 0.7rem; border-top:1px solid #F4F4F4;">
+            <span style="font-size: 0.7rem; margin-left: 0.61rem;margin-bottom: 0.61rem;">送货地址</span>
+            <span style="margin-left:0.61rem; " v-text="orders.shipAddress"></span>
+            <div class="flex-row base-padding" style="font-size: 0.7rem; margin-top: 0.4rem;">
+                <span style=" " v-text="orders.shipPhone"></span>
+                <span style="margin-left:1.61rem; " v-text="orders.shipContact"></span>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        vm.ordersId= params.ordersId;
+        // vm.ordersId = '201909031259293277';
+        console.log(vm.ordersId);
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.initData();
+    };
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '订单详情',
+            orders:{
+                buyer:{}
+            },
+            ordersId: '',
+            totalRent: 0,
+        },
+        methods: {
+            initData() {
+                this.getOrds();
+            },
+            getOrds(){
+                var that = this;
+                ajaxPost('/orders/get', that.ordersId + '', function(ret, err) {
+                    if (ret) {
+                        console.log(JSON.stringify(ret));
+                        if (ret.returnCode == '1') {
+                            that.orders = ret.data;
+                            that.orders.buyer = ret.data.buyer;
+                            if (that.orders.tradeType == 1) {
+                                that.totalRent = that.orders.goodsPrice * that.orders.rentTime;
+                                that.totalRent = Math.round(that.totalRent * 100) / 100;
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+        }
+    })
+
+</script>
+
+</html>

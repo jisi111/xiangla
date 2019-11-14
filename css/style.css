@@ -1,0 +1,137 @@
+html,body {
+    height:100%;
+    background-color: white;
+    color: #515151;
+}
+#app {
+    width: 100%;
+    height: 100%;
+}
+:root {
+    --theme-color: white;
+    --theme-black: #515151;
+    --theme-grey: #9E9E9E;
+    --theme-light-grey: #EEEEEE;
+    --theme-yellow: #FFCE54;
+    --theme-red: #FF4081;
+    --theme-green: #3AB2BF;
+    --header-height: 2rem;
+    --padding-width: 0.65rem;
+    --theme-deep-yellow: #FFC125;
+}
+header {
+    height: var(--header-height);
+    background-color: var(--theme-color);
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+}
+.main-win {
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+}
+.header-fix {
+    position: fixed;
+    z-index: 999;
+}
+.ellipsis {
+    white-space:nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ellipsis-2 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.base-padding {
+    width: 100%;
+    padding: 0 var(--padding-width);
+}
+.size-large {
+    font-size: 18px;
+}
+.size-common {
+    font-size: 16px;
+}
+.size-small {
+    font-size: 14px;
+}
+.size-mini {
+    font-size: 12px;
+}
+.left-logo {
+    width: 30px;
+    height: 30px;
+    float:left;
+    margin-top: 7px;
+    margin-left: 10px;
+}
+.theme-bg {
+    background-color: var(--theme-color);
+    color: var(--theme-black);
+    border-bottom: 1px solid var(--theme-light-grey);
+}
+.common-btn {
+    color: white;
+    height: 45px;
+    line-height: 45px;
+}
+.grey-bg {
+    background-color: var(--theme-light-grey);
+}
+.grey-input {
+    background-color: var(--theme-light-grey);
+    border-radius:5px;
+    height: 45px;
+    line-height: 45px;
+    padding: 0 10px;
+}
+.grey-line {
+    background-color: var(--theme-light-grey);
+    height: 1px;
+    width: 100%;
+}
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+.flex-center {
+    justify-content: center;
+}
+.flex-between {
+    justify-content: space-between;
+}
+.flex-1 {
+    flex: 1;
+}
+.follow-btn {
+    width: 70px;
+    height: 26px;
+    line-height: 26px;
+    background-color: var(--theme-yellow);
+    border-radius: 15px;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+}
+.follow-btn:active {
+    background-color: var(--theme-deep-yellow);;
+}
+/*已关注样式*/
+.follow-al-btn{
+  width: 70px;
+  height: 26px;
+  line-height: 26px;
+  border:1px solid var(--theme-yellow);
+  border-radius: 15px;
+  color:var(--theme-yellow);
+  font-size: 14px;
+  text-align: center;
+}

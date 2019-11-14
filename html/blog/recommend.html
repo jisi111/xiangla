@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板-下拉刷新</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="" style="width: 100%; " v-for='(item, index) in recommendList'>
+        <div class="base-padding" >
+            <div class="flex-row " style="align-items: center; margin-top: 0.85rem;">
+                <img :src="item.author.image" style="width: 2.155rem; height: 2.155rem; border-radius: 50%; " @click='userClick(item)'>
+                <div class="flex-col" style="margin-left: 0.5rem; " @click='userClick(item)'>
+                    <span style="font-size: 0.69rem; " v-text='item.author.nickName'></span>
+                    <span style="font-size: 0.6rem; color: var(--theme-grey); " v-text='item.createTime'></span>
+                </div>
+                <div class="" style="flex: 1;"></div>
+                <div class="" v-if='item.authorId != userId'>
+                    <div v-if='item.isFollowed == 0 || item.isFollowed == undefined'
+                        class="follow-btn" @click='addFollow(item,index)'>
+                        关注
+                    </div>
+                    <div v-if='item.isFollowed == 1' class="follow-al-btn" @click='delectFollow(item,index)'>
+                        已关注
+                    </div>
+                </div>
+            </div>
+            <div class="" style="font-size: 0.8rem; margin-top: 1rem; ">
+                <!-- 内容 -->
+                <div class="" @click='blogClick(item)' v-text='item.content'></div>
+                <!-- 图片 -->
+                <div class="flex-row flex-between" v-if='item.mediaType == 1'
+                    style="flex-wrap: wrap; margin-top: 0.4rem; ">
+                    <!-- 1张图 -->
+                    <div class="" v-if='item.imageList.length == 1'
+                        style="margin-top: 0.25rem; overflow: hidden; background-color: var(--theme-light-grey);"
+                        v-bind:style='{width: getWidth2(), height: getWidth2()}'
+                        v-for='(imageItem, imageIndex) in item.imageList'
+                        @click='picClick(imageItem, imageIndex, item.imageList)'>
+                        <img :src="imageItem" style="width:100%; height:auto;">
+                    </div>
+                    <!-- 2、4张图 -->
+                    <div class="" v-if='item.imageList.length == 2 || item.imageList.length == 4'
+                        style="margin-top: 0.25rem; overflow: hidden; background-color: var(--theme-light-grey);"
+                        v-bind:style='{width: getWidth2(), height: getWidth2()}'
+                        v-for='(imageItem, imageIndex) in item.imageList'
+                        @click='picClick(imageItem, imageIndex, item.imageList)'>
+                        <img :src="imageItem" style="width:100%; height:auto;">
+                    </div>
+                    <!-- 3、5、6张图 -->
+                    <div class="" v-if='item.imageList.length == 3 || item.imageList.length == 5 || item.imageList.length == 6'
+                        style="margin-top: 0.25rem; overflow: hidden; background-color: var(--theme-light-grey);"
+                        v-bind:style='{width: getWidth3(), height: getWidth3()}'
+                        v-for='(imageItem, imageIndex) in item.imageList'
+                        @click='picClick(imageItem, imageIndex, item.imageList)'>
+                        <img :src="imageItem" style="width:100%; height:auto;">
+                    </div>
+                </div>
+                <div class="flex-row" v-if='item.mediaType == 2' style="margin-top: 0.4rem; "
+                    @click='videoClick(item)'>
+                    <div class="" style="position: relative; margin-top: 0.25rem; overflow: hidden; background-color: var(--theme-light-grey); "
+                        v-bind:style='{width: getWidth2(), height: getWidth2()}'>
+                        <img :src="item.cover"
+                            style="width: 100%; height: auto; ">
+                        <div class="flex-row"
+                            style="z-index: 80; align-items: center; width: 100%; height: 100%; background-color: transparent; position: absolute; top: 0; right: 0;">
+                            <img src="../../image/video.png" style="width: 2rem; height: 2rem; margin: auto;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="flex-row" style="margin-top: 0.85rem; ">
+                <div class="flex-row" style="color: #1094DD; align-items: center; background-color: #f4f3fb; border-radius: 0.75rem; padding: 0.15rem 0.5rem; ">
+                    <img src="../../image/groups.png" style="width: 0.75rem; height: 0.75rem; ">
+                    <span style="margin-left: 0.25rem; font-size: 0.7rem; " v-text='item.groupsName'></span>
+                </div>
+            </div> -->
+            <div class="flex-row" style="align-items: center; padding: 1.25rem 0.15rem 0.85rem; align-items:center ">
+                <div class="flex-row flex-between" style="width: 60%; ">
+                    <div class="flex-row" style="align-items: center; " @click=''>
+                        <img v-if='item.isLiked == 0  || item.isLiked == undefined' src="../../image/like.png" @click='addLike(item, index)' style="width: 0.75rem; height: 0.75rem; ">
+                        <img v-if='item.isLiked == 1' src="../../image/like-focus.png" @click='delLike(item, index)' style="width: 0.75rem; height: 0.75rem; ">
+                        <span style="margin-left: 0.43rem; font-size: 0.7rem; " v-text='item.likeNum'></span>
+                    </div>
+                    <div class="flex-row" style="align-items: center; ">
+                        <img src="../../image/comment.png" style="width: 0.75rem; height: 0.75rem; ">
+                        <span style="margin-left: 0.43rem; font-size: 0.7rem; " v-text='item.commentNum'></span>
+                    </div>
+                    <div class="flex-row" style="align-items: center; ">
+                        <img v-if='item.isCollected==0 || item.isCollected == undefined' src="../../image/collect.png" @click='addCollect(item, index)'style="width: 0.75rem; height: 0.75rem; ">
+                        <img v-if='item.isCollected==1' src="../../image/collect-focus.png" @click='delCollect(item, index)'style="width: 0.75rem; height: 0.75rem; ">
+                        <span style="margin-left: 0.43rem; font-size: 0.6rem; " v-text='item.collectNum'></span>
+                    </div>
+                </div>
+                <div class="flex-1"></div>
+                <img src="../../image/share.png" style="width: 0.85rem; height: 0.85rem; ">
+            </div>
+        </div>
+        <div class="grey-line" style="height: 0.5rem;"></div>
+    </div>
+    <div class="flex-row " @click='gotoPublish'
+        style="background-color: #FFE082; width: 2.6rem; height: 2.6rem; border-radius: 50%; position: fixed; z-index: 1000; bottom: 0.65rem; right: 0.65rem; align-items: center; ">
+        <img src="../../image/camera.png" style="width: 1.3rem; height: 1.2rem; margin: 0 auto;">
+    </div>
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var photoBrowser;
+
+    apiready = function() {
+        api.parseTapmode();
+        photoBrowser = api.require("photoBrowser");
+
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+
+        api.addEventListener({
+            name:'scrolltobottom',
+            extra:{
+                threshold: 0
+            }
+        }, function(ret, err){
+            // console.log('scrolltobottom');
+            vm.getNextPage();
+        });
+
+        vm.initData();
+    };
+
+    function refreshData() {
+        vm.initData();
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板Frame',
+            userId: 0,
+            page: {
+                current: 1,
+                size: 10,
+                pages: 0,
+                total: 0
+            },
+            recommendList: [],
+        },
+        methods: {
+            getWidth2() {
+                return ((api.winWidth - 30) / 2) + 'px';
+            },
+            getWidth3() {
+                return ((api.winWidth - 30) / 3) + 'px';
+            },
+            addFollow(item, index) {
+                if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                    api.openWin({
+                        name: 'phone_login1',
+                        url: '../user/phone_login1.html',
+                        slidBackEnabled: true
+                    });
+                    return;
+                }
+
+                // console.log(JSON.stringify(item));
+                var that = this;
+                ajaxPost('/follow/add', item.authorId + '', function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            if (item.isFollowed == 0) {
+                                that.$set(that.recommendList[index], 'isFollowed', 1)
+                            } else {
+                                that.$set(that.recommendList[index], 'isFollowed', 0)
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            delectFollow(item, index){
+                var that = this;
+                ajaxPost('/follow/delete', item.authorId + '', function(ret,err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            if (item.isFollowed == 0) {
+                                that.$set(that.recommendList[index], 'isFollowed', 1)
+                            } else {
+                                that.$set(that.recommendList[index], 'isFollowed', 0)
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            addLike(item, index) {
+                if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                    api.openWin({
+                        name: 'phone_login1',
+                        url: '../user/phone_login1.html',
+                        slidBackEnabled: true
+                    });
+                    return;
+                }
+
+                var that =this;
+                var params= {
+                    objId: item.id,
+                    objType: 1
+                };
+                ajaxPost('/likes/add', params, function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if(ret){
+                            if(ret.returnCode == '1'){
+                              if (item.isLiked == 0 || item.isLiked == undefined) {
+                                  that.$set(that.recommendList[index], 'isLiked', 1);
+                                  var likeNum = item.likeNum+1;
+                                  that.$set(that.recommendList[index], 'likeNum', likeNum);
+                              } else {
+                                  that.$set(that.recommendList[index], 'isLiked', 0);
+                                  var likeNum = item.likeNum-1;
+                                  that.$set(that.recommendList[index], 'likeNum', likeNum);
+                              }
+                            }else{
+                              api.toast({
+                                  msg: ret.returnMsg,
+                                  location: 'middle'
+                              });
+                            }
+                      }else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                      }
+                  })
+            },
+            delLike(item, index) {
+                  var that =this;
+                  var params={
+                    objId: item.id,
+                     objType: 1
+                  };
+                  ajaxPost('/likes/delete',params,function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    if(ret){
+                          if(ret.returnCode == '1'){
+                            if (item.isLiked == 0 || item.isLiked == undefined) {
+                                that.$set(that.recommendList[index], 'isLiked', 1);
+                                var likeNum = item.likeNum+1;
+                                that.$set(that.recommendList[index], 'likeNum', likeNum);
+                            } else {
+                                that.$set(that.recommendList[index], 'isLiked', 0);
+                                  var likeNum = item.likeNum-1;
+                                  that.$set(that.recommendList[index], 'likeNum', likeNum);
+                            }
+                          }else{
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                          }
+                    }else {
+                      api.toast({
+                          msg: JSON.stringify(err),
+                          location: 'middle'
+                      });
+                    }
+                  })
+            },
+            addCollect(item,index){
+                if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                    api.openWin({
+                        name: 'phone_login1',
+                        url: '../user/phone_login1.html',
+                        slidBackEnabled: true
+                    });
+                    return;
+                }
+
+                var that = this;
+                var params={
+                  objId :item.id,
+                  objType:1
+                };
+                ajaxPost('/collections/add',params,function(ret,err){
+                    // console.log(JSON.stringify(ret));
+                    if(ret){
+                        if(ret.returnCode==1){
+                            if(item.isCollected==0 || item.isCollected == undefined){
+                              that.$set(that.recommendList[index],'isCollected',1);
+                              var collectNum=item.collectNum+1;
+                              that.$set(that.recommendList[index],'collectNum',collectNum);
+                            }else{
+                              that.$set(that.recommendList[index],'isCollected',0);
+                               var collectNum=item.collectNum-1;
+                                 that.$set(that.recommendList[index],'collectNum',collectNum);
+                            }
+                        }else{
+                          api.toast({
+                            msg:ret.returnCode,
+                            location:'middle'
+                          });
+                        }
+                    }else{
+                      api.toast({
+                        msg:JSON.stringify(err),
+                        location:'middle'
+                      });
+                    }
+                })
+
+            },
+            delCollect(item,index){
+              var that = this;
+              var params={
+                objId :item.id,
+                objType:1
+              };
+              ajaxPost('/collections/delete',params,function(ret,err){
+                  // console.log(JSON.stringify(ret));
+                  if(ret){
+                      if(ret.returnCode==1){
+                          if(item.isCollected==0 || item.isCollected == undefined){
+                            that.$set(that.recommendList[index],'isCollected',1);
+                            var collectNum=item.collectNum+1;
+                            that.$set(that.recommendList[index],'collectNum',collectNum);
+                          }else{
+                            that.$set(that.recommendList[index],'isCollected',0);
+                             var collectNum=item.collectNum-1;
+                               that.$set(that.recommendList[index],'collectNum',collectNum);
+                          }
+                      }else{
+                        api.toast({
+                          msg:ret.returnCode,
+                          location:'middle'
+                        });
+                      }
+                  }else{
+                    api.toast({
+                      msg:JSON.stringify(err),
+                      location:'middle'
+                    });
+                  }
+              })
+            },
+            initData() {
+                if ($api.getStorage('userId')) {
+                    this.userId = parseInt($api.getStorage('userId'));
+                    console.log('userId ' + this.userId);
+                }
+                this.page.current = 1;
+                this.getList();
+            },
+            gotoPublish() {
+                // api.openWin({
+                //     name: 'video_chat_win',
+                //     url: '../chat/video_chat_win.html',
+                //     pageParam: {
+                //         publishType: 'blog'
+                //     },
+                //     reload: true
+                // });
+                // return;
+                if ($api.getStorage('userInfo') == undefined || $api.getStorage('userInfo') == '') {
+                    api.openWin({
+                        name: 'phone_login1',
+                        url: '../user/phone_login1.html',
+                        slidBackEnabled: true
+                    });
+                    return;
+                }
+
+                $api.rmStorage('selectedMediaList');// 清空已选图片、视频
+                api.openWin({
+                    name: 'select_media',
+                    url: './select_media.html',
+                    pageParam: {
+                        publishType: 'blog'
+                    },
+                    reload: true
+                });
+            },
+            getList() {
+                var that = this;
+                var params = {
+                    queryParams: {
+                        userId: $api.getStorage('userId')
+                    },
+                    page: that.page
+                };
+                console.log('params ' + JSON.stringify(params));
+                ajaxPost('/blog/getRecommendList', params, function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.page = ret.data.page;
+                            if (that.page.current == 1) {
+                                that.recommendList = ret.data.list;
+                            } else {
+                                that.recommendList.push.apply(that.recommendList, ret.data.list);
+                                api.pageDown(function( ret, err ){});
+                            }
+                        } else if (ret.returnCode == '-9') {// token过期，跳转登录
+                            api.openWin({
+                                name: 'phone_login1',
+                                url: '../user/phone_login1.html'
+                            });
+                            return;
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            getNextPage() {
+                if (this.page.current >= this.page.pages) {
+                    api.toast({
+                        msg: '没有更多内容',
+                        location: 'middle'
+                    });
+                    return;
+                }
+                this.page.current++;
+                this.getList();
+            },
+            userClick(item) {
+                api.openWin({
+                    name: 'user_page',
+                    url: '../user/user_page.html',
+                    pageParam: {
+                        userId: item.authorId
+                    }
+                });
+            },
+            videoClick(item) {
+                console.log('videoClick ' + JSON.stringify(item.video));
+                api.openWin({
+                    name: 'player',
+                    url: '../player/player.html',
+                    pageParam: {
+                        // videoUrl: 'http://7o50kb.com2.z0.glb.qiniucdn.com/c1.1.mp4',
+                        videoUrl: item.video,
+                        videoTitle: ''
+                    },
+                    slidBackEnabled: true
+                });
+            },
+            blogClick(item) {
+                api.openWin({
+                    name: 'blog_detail',
+                    url: './blog_detail.html',
+                    pageParam: {
+                        blogId: item.id
+                    }
+                });
+            },
+            picClick(item, index, imageList) {
+                api.openWin({
+                    name: 'player',
+                    url: '../player/player.html',
+                    pageParam: {
+                        // videoUrl: 'http://7o50kb.com2.z0.glb.qiniucdn.com/c1.1.mp4',
+                        videoUrl: 'http://chuansi.oss-cn-hangzhou.aliyuncs.com/ttt.mp4',
+                        videoTitle: ''
+                    },
+                    slidBackEnabled: true
+                });
+                // var imageArray = [];
+                // for (var i = 0; i < imageList.length; i++) {
+                //     imageArray.push(imageList[i]);
+                // }
+                // photoBrowser.open({
+                //     // images:  ['http://img4.imgtn.bdimg.com/it/u=1265820520,737837016&fm=26&gp=0.jpg', 'http://img1.cache.netease.com/catchpic/3/30/30C60DCC88EEF0AA507740007AB08251.jpg'],
+                //     images: imageArray,
+                //     placeholderImg: 'widget://res/img/apicloud.png',
+                //     bgColor: '#000',
+                //     activeIndex: index
+                // }, function(ret, err) {
+                //     if (ret.eventType == "click") {
+                //         photoBrowser.close()
+                //     } else {
+                //     }
+                // });
+            },
+        }
+    })
+
+</script>
+
+</html>

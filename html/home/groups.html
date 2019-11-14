@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板-下拉刷新</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        .tab-row {
+            border: none;
+            overflow-x: scroll;
+            -webkit-backface-visibility: hidden;
+            -webkit-perspective: 1000;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: row;
+        }
+        /*去除滚动条*/
+        .tab-row::-webkit-scrollbar{
+            display: none;
+        }
+        .tab-item {
+            white-space: nowrap;
+        }
+        .group-title {
+            width: 100%;
+            height: 2rem;
+            padding: 0 0.5rem;
+            margin: 0.5rem 0;
+            align-items: center;
+            color: white;
+            font-size: 0.8rem;
+            background-image: url(../../image/group-title-bg.png);
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="base-padding flex-row" style="margin-top: 1.3rem; align-items: center; ">
+        <img src="../../image/location-1.png" style='width: 0.85rem; height: 0.95rem; margin-left: 0.25rem;' >
+        <span style="font-size: 1.3rem; margin-left: 0.25rem; ">珠海市</span>
+    </div>
+    <div class="base-padding flex-row" style="margin: 0.75rem 0; align-items: center; color: var(--theme-grey);">
+        <img src="../../image/user-photo.png" style="width: 2.3rem; height: 2.3rem; border-radius: 50%; padding: 0.15rem; background-color: white; ">
+        <img src="../../image/user-photo.png" style="width: 2.3rem; height: 2.3rem; margin-left: -0.75rem; border-radius: 50%; padding: 0.15rem; background-color: white;">
+        <img src="../../image/user-photo.png" style="width: 2.3rem; height: 2.3rem; margin-left: -0.75rem; border-radius: 50%; padding: 0.15rem; background-color: white;">
+        <img src="../../image/user-photo.png" style="width: 2.3rem; height: 2.3rem; margin-left: -0.75rem; border-radius: 50%; padding: 0.15rem; background-color: white;">
+        <img src="../../image/user-photo.png" style="width: 2.3rem; height: 2.3rem; margin-left: -0.75rem; border-radius: 50%; padding: 0.15rem; background-color: white;">
+        <span style="margin-left: 0.5rem; font-size: 0.7rem;  " @click="gotoGroupsList">全部</span>
+        <i class="aui-iconfont aui-icon-right" @click="gotoGroupsList" style="font-size: 0.6rem; margin-left: 0.5rem; " ></i>
+    </div>
+    <div class="grey-line" style="height: 0.5rem; "></div>
+
+    <div class="flex-row flex-between " style="font-size: 0.7rem; padding: 0.5rem 0.65rem; align-items: center; ">
+        <span style="font-weight: bold; ">我加入的</span>
+        <div class="" style="flex: 1; "></div>
+        <span style="margin-left: 0.5rem; color: var(--theme-grey); " @click="gotoGroupsList">全部</span>
+        <i class="aui-iconfont aui-icon-right" @click="gotoGroupsList" style="font-size: 0.6rem; margin-left: 0.5rem; color: var(--theme-grey); "></i>
+    </div>
+    <div class="grey-line"></div>
+
+    <div class="tab-row " style="padding: 1rem; ">
+        <div class="tab-item" @click='gotoGroupsDetail'>
+            <div class="flex-row" >
+                <img src="../../image/group-cover-01.png" style="width: 2.2rem; height: 2.2rem; border-radius: 50%; ">
+                <div class="flex-col" style="margin-left: 0.5rem; ">
+                    <span style="font-size: 0.8rem; ">Alice音乐中心</span>
+                    <span style="font-size: 0.65rem; color: var(--theme-grey); ">成年即兴伴奏主力军</span>
+                </div>
+            </div>
+        </div>
+        <div class="tab-item" style="margin-left: 1rem; " @click='gotoGroupsDetail'>
+            <div class="flex-row" >
+                <img src="../../image/group-cover-02.png" style="width: 2.2rem; height: 2.2rem; border-radius: 50%; ">
+                <div class="flex-col" style="margin-left: 0.5rem; ">
+                    <span style="font-size: 0.8rem; ">美美画室</span>
+                    <span style="font-size: 0.65rem; color: var(--theme-grey); ">水彩油墨</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="grey-line" style="height: 0.5rem; "></div>
+
+    <div class="" style="width: 100%; padding-top: 0.85rem;">
+        <div class="base-padding">
+            <div class="flex-row group-title" style="height: 1.75rem; align-items: center;">
+                <img src="../../image/group-logo-1.png" style="width: 1.1rem; height: 1.1rem; ">
+                <span style="font-size: 0.78rem; margin-left:0.43rem;">来自Alice音乐中心</span>
+                <div class="" style="flex: 1;"></div>
+                <span style="font-size: 0.5rem;">1000次围观</span>
+            </div>
+            <div class="" style="margin-top: 0.85rem; ">
+                <img src="../../image/recommend-01.jpg" style="width: 50%; height: auto; ">
+            </div>
+            <div class="" style="margin-top: 0.85rem; font-size: 0.7rem; ">
+                不请老师的原因有三：降低成本。既包括钱，也包括时间。因为给孩子安排的课比较...
+            </div>
+            <div class="flex-row " style="align-items: center; margin: 0.5rem 0; font-size: 0.6rem; ">
+                <img src="../../image/user-photo.png" style="width: 0.85rem; height: 0.85rem; border-radius: 50%; ">
+                <span style="margin-left: 0.25rem; ">小妞妈妈</span>
+                <span style="color: var(--theme-grey); margin-left: 0.45rem; font-size: 0.5rem; ">1小时前</span>
+                <div class="" style="flex: 1; "></div>
+                <div class="flex-row" style="align-items: center; color: var(--theme-grey); ">
+                    <img src="../../image/like.png" style="width: 0.75rem; height: 0.75rem; ">
+                    <span style="margin-left: 0.15rem; font-size: 0.6rem; ">135</span>
+                </div>
+            </div>
+        </div>
+        <div class="grey-line" style="height: 0.5rem; "></div>
+    </div>
+
+    <div class="flex-row " @click='gotoPublishBlog'
+        style="background-color: #FFE082; width: 2.6rem; height: 2.6rem; border-radius: 50%; position: fixed; z-index: 1000; bottom: 0.65rem; right: 0.65rem; align-items: center; ">
+        <img src="../../image/camera.png" style="width: 1.2rem; height: 1.2rem; margin: 0 auto;">
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+    };
+
+    function refreshData() {
+        vm.initData();
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '基本模板Frame'
+        },
+        methods: {
+            initData() {
+
+            },
+            gotoGroupsDetail() {
+                api.openWin({
+                    name: 'groups_detail',
+                    url: '../groups/groups_detail.html',
+                    pageParam: {
+                        name: 'test'
+                    }
+                });
+            },
+            gotoPublishBlog() {
+                api.openWin({
+                    name: 'publish_blog',
+                    url: './publish_blog.html',
+                    pageParam: {
+                        name: 'test'
+                    }
+                });
+            },
+            gotoGroupsList() {
+                api.openWin({
+                    name: 'groups_list',
+                    url: '../groups/groups_list.html',
+                    pageParam: {
+                        name: 'test'
+                    }
+                });
+            }
+
+        }
+    })
+
+</script>
+
+</html>

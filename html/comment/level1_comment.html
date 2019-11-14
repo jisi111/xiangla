@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"/>
+    <style>
+        input[type=text] {
+            border-radius: 1.5rem;
+            background-color: var(--theme-light-grey);
+            border-color: var(--theme-light-grey);
+            padding-left: 0.5rem;
+        }
+        input[type=text]:focus {
+            background-color: var(--theme-light-grey);
+            border-color: var(--theme-light-grey);
+            padding-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div id="app" >
+    <header class="aui-bar aui-bar-nav theme-bg header-fix" >
+        <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: var(--theme-black);"></i>
+        <div class="aui-title" style="display: flex; ">
+            <div style="margin: 0 auto; display: flex;">
+                <div style="" v-text='title'></div>
+            </div>
+        </div>
+        <a class="aui-pull-right aui-btn" >
+            <img style="width: 1rem; height: 1rem;" src="../../image/share-grey.png">
+        </a>
+    </header>
+	<!--高度至少1px才能有效偏移-->
+    <div id='first-el' style="height: 1px; "></div>
+
+    <div class="" style="margin: 0.7rem 0; font-size: 0.7rem; " v-for='(item, index) in commentList'>
+        <!-- 用户头像、昵称、时间 -->
+        <div class="flex-row base-padding" style="align-items: center; margin-top: 1.3rem;">
+            <img :src="item.commentator.image" style="width: 2rem; height: 2rem; border-radius: 50%; ">
+            <div class="flex-col" style="margin-left: 0.5rem; ">
+                <span style="font-size: 0.7rem; " v-text='item.commentator.nickName'></span>
+                <span style="font-size: 0.6rem; color: var(--theme-grey); " v-text='getFormatTime(item.createTime)'></span>
+            </div>
+            <div class="" style="flex: 1;"></div>
+            <div class="flex-row" style="color: var(--theme-grey); ">
+                <span v-text='item.likeNum'></span>
+                <img src="../../image/like.png" style="width: 1rem; height: 1rem; margin-left: 0.15rem;">
+            </div>
+        </div>
+        <!-- 评论内容 -->
+        <div class="flex-row" style="margin-top: 0.5rem; padding-left: 3rem;">
+            <span style="" v-text='item.content' @click='showLevel2Input(item)'></span>
+        </div>
+        <!-- 2级评论内容 -->
+        <div class="flex-row" style="margin-top: 0.5rem; padding: 0 0.5rem 0 3rem;"
+            v-for='(subItem, subIndex) in item.level2CommentList'
+            @click='gotoLevel2(subItem)' >
+            <div class="base-padding flex-row" style="width: 100%; align-items: center; background-color: var(--theme-light-grey); ">
+                <!-- 作者 -->
+                <div v-if='subItem.commentator.id == authorId'
+                    style="padding: 0.25rem 0; color: #1094DD; ">
+                    <span style="font-weight: bold;"
+                        v-text='subItem.commentator.nickName'></span>
+                    <span>(作者):</span>
+                </div>
+                <div v-if='subItem.commentator.id != authorId'
+                    style="padding: 0.25rem 0; color: var(--theme-grey); ">
+                    <span style="font-weight: bold; color: var(--theme-black); "
+                        v-text='subItem.commentator.nickName'></span>
+                    <span>:</span>
+                </div>
+                <!-- 内容 -->
+                <span v-text='subItem.content' style="margin-left: 0.15rem;"></span>
+            </div>
+        </div>
+        <div v-if='item.level2CommentList.length > 1' class="flex-row" style="margin-top: 0.5rem; padding: 0 0.5rem 0 3rem; color: #1094DD;">
+            <span style="font-weight: bold; ">查看</span>
+            <span v-text='item.level2CommentList.length'></span>
+            <span style="font-weight: bold; ">条回复&nbsp;&gt;</span>
+        </div>
+    </div>
+
+    <!-- 评论内容输入 -->
+    <div class="flex-row" style="width: 100%; position: fixed; bottom: 0; align-items: center; padding: 0.5rem 0.65rem; background-color: white;">
+        <input id='inputLine' v-model='level1Comment' type="text" placeholder="请输入评论内容" style="flex: 1; height: 2rem; " autofocus="autofocus" >
+        <div @click='addLevel1Comment' style="width: 4rem; height: 1.8rem; line-height: 1.8rem; margin-left: 0.5rem; border-radius: 0.75rem; background-color: #E4007F; color:#FFFFFF;font-size: 0.8rem; text-align:center;">
+            发送
+        </div>
+    </div>
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js" ></script>
+<script type="text/javascript" src="../../script/aui-toast.js" ></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        vm.topicId = params.topicId;
+        vm.topicType = params.topicType;
+        vm.authorId = params.authorId;
+        vm.initData();
+
+        api.addEventListener({
+            name:'scrolltobottom',
+            extra:{
+                threshold: 0
+            }
+        }, function(ret, err){
+            // console.log('scrolltobottom');
+            vm.getNextPage();
+        });
+
+        api.addEventListener({
+            name:'viewappear'
+        }, function(ret, err){
+            vm.page.current = 1;
+            vm.getList();
+        })
+    };
+
+    function addLevel2CommentFunc(content) {
+        vm.addLevel2Comment(content);
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '评论',
+            authorId: 0,
+            topicId: 0,
+            topicType: 1,
+            level1Comment: '',
+            commentList: [],
+            page: {
+                current: 1,
+                size: 10,
+                pages: 0,
+                total: 0
+            },
+            selectedComment: {},
+        },
+        methods: {
+            initData() {
+                this.getList();
+            },
+            showLevel2Input(item) {
+                this.selectedComment = item;
+                api.openFrame({
+                    name: 'comment_input_line',
+                    url: './comment_input_line.html',
+                    bgColor: 'rgba(0, 0, 0, 0.7)',
+                    pageParam: {
+                        ordersId: item.id,
+                        prevPage: 'level1_comment'
+                    },
+                    reload: true
+                });
+            },
+            gotoLevel2(item) {
+                console.log(JSON.stringify(item));
+                api.openWin({
+                    name: 'level2_comment',
+                    url: './level2_comment.html',
+                    pageParam: {
+                        targetComment: item,
+                        topicId: this.topicId,
+                        topicType: this.topicType,
+                        topicAuthorId: this.authorId
+                    }
+                });
+            },
+            getNextPage() {
+                if (this.page.current >= this.page.pages) {
+                    api.toast({
+                        msg: '没有更多内容',
+                        location: 'middle'
+                    });
+                    return;
+                }
+                this.page.current++;
+                this.getList();
+            },
+            getFormatTime(time) {
+                var startDate = time.replace(new RegExp("-","gm"),"/");
+                var startDateM = (new Date(startDate)).getTime(); //得到毫秒数
+                return timeDiff(startDateM);
+            },
+            addLevel1Comment() {
+                var that = this;
+                var reg = /^[\u4E00-\u9FA5A-Za-z0-9_]+$/
+                if(!reg.test( that.level1Comment)){
+                  api.toast({
+                      msg: '评论内容不能为空',
+                      location: 'middle'
+                  });
+                }else{
+                  var params = {
+                      topicId: that.topicId,
+                      topicType: that.topicType,// 1博客，2商品
+                      level: 1,// 第一级评论
+                      content: that.level1Comment
+                  }
+                  console.log(JSON.stringify(params));
+                  ajaxPost('/comment/add', params, function(ret,arr){
+                    console.log(JSON.stringify(ret));
+                    if(ret){
+                          if(ret.returnCode == '1'){
+                              that.level1Comment = '';
+                              api.toast({
+                                  msg: '评论成功',
+                                  location: 'middle'
+                              });
+                              that.getList();
+                          } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                          }
+                    } else {
+                      api.toast({
+                          msg: JSON.stringify(err),
+                          location: 'middle'
+                      });
+                    }
+                  })
+                }
+            },
+            addLevel2Comment(content) {
+                var that = this;
+                var params = {
+                    topicId: that.topicId,
+                    topicType: that.topicType,// 1博客，2商品
+                    level: 2,// 第2级评论
+                    content: content,
+                    targetCommentId: that.selectedComment.id
+                }
+                ajaxPost('/comment/add', params, function(ret,arr){
+                  console.log(JSON.stringify(ret));
+                  if(ret){
+                        if (ret.returnCode == '1') {
+                            api.toast({
+                                msg: '评论成功',
+                                location: 'middle'
+                            });
+                            that.getList();
+                        } else {
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  } else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+            getList() {
+                var that = this;
+                var params = {
+                    queryParams: {
+                        topicId: that.topicId,
+                        topicType: that.topicType
+                    },
+                    page: that.page
+                }
+                console.log(JSON.stringify(params));
+                ajaxPost('/comment/getList', params, function(ret,arr){
+                  console.log(JSON.stringify(ret));
+                  if(ret){
+                        if (ret.returnCode == '1') {
+                            that.page = ret.data.page;
+                            if (that.page.current == 1) {
+                                that.commentList = ret.data.list;
+                            } else {
+                                that.commentList.push.apply(that.commentList, ret.data.list);
+                                api.pageDown(function( ret, err ){});
+                            }
+                        } else {
+                          api.toast({
+                              msg: ret.returnMsg,
+                              location: 'middle'
+                          });
+                        }
+                  } else {
+                    api.toast({
+                        msg: JSON.stringify(err),
+                        location: 'middle'
+                    });
+                  }
+                })
+            },
+
+        }
+    })
+
+</script>
+
+</html>

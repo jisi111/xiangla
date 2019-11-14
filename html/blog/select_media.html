@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <style>
+        .take-photo {
+            width: 3rem;
+            height: 3rem;
+            background-image: url(../../image/take-photo.png);
+            background-repeat:no-repeat;
+            background-size:100% 100%;
+        }
+        .take-photo:active {
+            width: 3rem;
+            height: 3rem;
+            background-image: url(../../image/take-photo-focus.png);
+            background-repeat:no-repeat;
+            background-size:100% 100%;
+        }
+        .aui-tab-item {
+            padding: 0 0.5rem;
+            font-size: 0.75rem;
+            color: white !important;
+        }
+        .aui-active {
+            font-weight: bold;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" style="background-color: black; ">
+        <header class="aui-bar aui-bar-nav header-fix" id='topLine' style="background-color: black; ">
+            <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBack' style="color: white;"></i>
+            <div class="aui-title" style="display: flex; ">
+                <div style="margin: 0 auto; display: flex;">
+                    <div style="" v-text='title'></div>
+                </div>
+            </div>
+            <div class="aui-pull-right aui-btn" style="background-color: red;">
+                <div class="follow-btn" @click='nextStep'>
+                    下一步
+                </div>
+            </div>
+        </header>
+        <!--高度至少1px才能有效偏移-->
+        <div id='first-el' style="height: 1px; background-color: black; "></div>
+
+        <!-- 选择照片 -->
+        <div class='flex-row ' v-if='selectedTabIndex == 0' style="width: 100%; flex-wrap: wrap; background-color: black;" >
+            <div class="" v-for='(item, index) in albumMediaList'
+                v-bind:style="{width: getImgWidth(), height: getImgWidth()} "
+                style="background-color: black; position: relative; padding: 2px; ">
+                <img :src="item.thumbPath" style="width: 100%; ">
+                <input class="aui-radio" type="checkbox" v-model="item.isChecked"
+                    @change='checkChange(item, index)' style="z-index: 100; position: absolute; top: 0.25rem; right: 0.25rem; width: 1rem !important; height: 1rem !important;">
+                <div class="flex-row" v-if='item.mediaType == "video" || item.mediaType == "Video"'
+                    style=" z-index: 80; align-items: center; width: 100%; height: 100%; background-color: transparent; position: absolute; top: 0; right: 0;">
+                    <img src="../../image/video.png" style="width: 2rem; height: 2rem; margin: auto;">
+                </div>
+            </div>
+        </div>
+
+        <!-- 拍照 -->
+        <div class='flex-row ' v-if='selectedTabIndex == 1' style="width: 100%; position: fixed; left: 0; bottom: 3rem;  background-color: black;" >
+            <div class="flex-row flex-between" style="width: 100%; padding: 0.5rem 3rem; color: white; align-items: center; ">
+                <div class="" style="width: 3rem;" >
+                    <img src="../../image/camera-switch.png" @click='switchPhotoCamera'
+                        style="width: 1.5rem; height: 1.5rem; ">
+                </div>
+                <div class="take-photo" @click='takePhoto'></div>
+                <div class="" style="width: 3rem; text-align: right;" ></div>
+            </div>
+        </div>
+
+        <!-- 拍视频 -->
+        <div class='flex-row ' v-if='selectedTabIndex == 2' style="width: 100%; position: fixed; left: 0; bottom: 3rem;  background-color: black;" >
+            <div class="flex-row flex-between" style="width: 100%; padding: 0.5rem 3rem; color: white; align-items: center; ">
+                <div class="" style="width: 3rem;" >
+                    <img src="../../image/camera-switch.png" @click='switchCamera'
+                        style="width: 1.5rem; height: 1.5rem; ">
+                </div>
+                <img src="../../image/record-start.png" v-if='recordStatus == 0 || recordStatus == 2'
+                    @click='startRecord' style="width: 2.5rem; height: 2.5rem; ">
+                <img src="../../image/recording.png" v-if='recordStatus == 1' @click='stopRecorder'
+                    style="width: 2.5rem; height: 2.5rem; ">
+                <div class="" style="width: 3rem; text-align: right;" v-text='getSecCount'></div>
+            </div>
+        </div>
+
+        <div class="aui-tab base-padding" style="width: 100%; position: fixed; z-index: 110; left: 0; bottom: 0; padding-bottom: 0.25rem; background-color: black;">
+            <div class="aui-tab-item" @click='tabClick(0)' v-bind:class='{"aui-active": selectedTabIndex == 0}'>相册</div>
+            <div class="aui-tab-item" @click='tabClick(1)' v-bind:class='{"aui-active": selectedTabIndex == 1}'>拍照</div>
+            <div class="aui-tab-item" @click='tabClick(2)' v-bind:class='{"aui-active": selectedTabIndex == 2}'
+                v-if='imageOnly == false || imageOnly == undefined'>拍视频</div>
+        </div>
+
+    </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js"></script>
+<script type="text/javascript" src="../../script/aui-toast.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var UIAlbumBrowser;
+    var videoRecorder;
+    var timeInterval;
+    var FNPhotograph;
+
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        if (params.isPlan) {
+            vm.isPlan = params.isPlan;
+        } else {
+            vm.isPlan = false;
+        }
+        vm.publishType = params.publishType;
+        vm.addMode = params.addMode;
+        vm.imageOnly = params.imageOnly;
+
+        // 图片增加的模式（用于发布页面的加号），要保留上次缓存的图片
+        if (vm.addMode == true) {
+            vm.selectedMediaList = $api.getStorage('selectedMediaList');
+            console.log(JSON.stringify(vm.selectedMediaList));
+        }
+
+        videoRecorder = api.require('videoRecorder');
+        UIAlbumBrowser = api.require('UIAlbumBrowser');
+        FNPhotograph = api.require('FNPhotograph');
+
+        vm.initData();
+
+        api.addEventListener({
+            name:'scrolltobottom',
+            extra:{
+                threshold: 50
+            }
+        }, function(ret, err){
+            console.log('scrolltobottom');
+            if (vm.selectedTabIndex == 0) {
+                vm.getNextPage();
+            }
+        });
+    };
+
+    function switchImageOnly() {
+        vm.imageOnly = true;
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '图片和视频',
+            publishType: 'blog',
+            addMode: false,// 新增图片模式，要保留上次缓存的图片
+            imageOnly: false, // 仅仅图片模式
+            selectedTabIndex: 0,
+            secCount: 0,
+            albumTotal: 0,// 图片视频总数
+            albumMediaList: [],
+            selectedMediaList: [],
+            selectedVideo: {},
+            recordStatus: 0,// 0未开始，1录制中，2录制完成
+            isPlan: false,
+        },
+        computed: {
+            getSecCount() {
+                var secStr = secondToMin(this.secCount);
+                return secStr;
+            },
+        },
+        methods: {
+            openPhotoTaker() {
+                var viewHeight = parseInt(api.winHeight * 0.65);
+                FNPhotograph.openCameraView({
+                    rect: {
+                        x: 13,
+                        y: $api.dom('#topLine').offsetTop + $api.dom('#topLine').offsetHeight,
+                        w: api.winWidth - 26,
+                        h: viewHeight
+                    },
+                    orientation: 'portrait',
+                    fixedOn: api.frameName,
+                    fixed: true
+                }, function(ret){
+                    console.log(JSON.stringify(ret));
+                    if (ret.status == false) {
+                        api.toast({
+                            msg: '摄像头打开失败' + ret.eventType,
+                            location: 'middle'
+                        });
+                    }
+                });
+            },
+            closePhotoTake() {
+                FNPhotograph.closeCameraView(function(ret) {
+                    if (ret) {
+                        console.log('closeCameraView ' + JSON.stringify(ret));
+                    }
+                });
+            },
+            takePhoto() {
+                var that = this;
+                api.showProgress({
+                    title: '图片处理中...'
+                });
+                var fileName = getTimeStr() + randomNum(1000, 9999)
+                FNPhotograph.takePhoto({
+                    qualityValue: 50,
+                    path: 'fs://FNPhotograph/' + fileName,
+                    album: true
+                }, function(ret) {
+                    api.hideProgress();
+                    console.log(JSON.stringify(ret));
+                    if (ret.imagePath == undefined || ret.imagePath == '') {
+                        api.toast({
+                            msg: '拍照失败',
+                            location: 'middle'
+                        });
+                        return;
+                    }
+
+                    var mediaType = that.getMediaType();
+                    // 是否同时选择了视频和图片，blog、plan有此限制，goods没有
+                    console.log('publishType ' + that.publishType);
+                    if ((that.publishType == 'blog' || that.publishType == 'plan')
+                        && mediaType == 'video') {
+                        api.toast({
+                            msg: '您已选择视频，不能再选择拍照',
+                            location: 'middle'
+                        });
+                        return;
+                    }
+
+                    // 路径存入缓存
+                    var photoItem = {};
+                    photoItem.mediaType = 'image';
+                    photoItem.path = ret.imagePath;
+                    photoItem.thumbPath = ret.imagePath;
+                    photoItem.needNoTranspath = true;
+                    if (this.publishType != 'planCover' && this.publishType != 'userImage') {// blog,goods
+                        that.selectedMediaList.push(photoItem)
+                    } else {// plan换图片，用户换头像，只存一条数据到selectedMediaList
+                        if (this.selectedMediaList.length == 0) {
+                            this.selectedMediaList.push(item);
+                        } else {
+                            this.selectedMediaList[0] = item;
+                        }
+                        return;
+                    }
+                    console.log(JSON.stringify(that.selectedMediaList));
+                });
+            },
+            switchPhotoCamera() {
+                FNPhotograph.getCamera(function(ret) {
+                    if (ret.status) {
+                        if (ret.camera == 'front') {
+                            FNPhotograph.setCamera({
+                                camera: 'back'
+                            });
+                        } else {
+                            FNPhotograph.setCamera({
+                                camera: 'front'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: '切换失败' + JSON.stringify(ret),
+                            location: 'middle'
+                        });
+                    }
+                });
+            },
+            switchCamera() {
+                videoRecorder.getCamera(function(ret) {
+                    if (ret.status) {
+                        if (ret.camera == 'front') {
+                            videoRecorder.setCamera({
+                                camera: 'back'
+                            });
+                        } else {
+                            videoRecorder.setCamera({
+                                camera: 'front'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: '切换失败' + JSON.stringify(ret),
+                            location: 'middle'
+                        });
+                    }
+                });
+            },
+            openRecorder() {
+                var that = this;
+                var viewHeight = parseInt(api.winHeight * 0.65);
+                videoRecorder.open({
+                    rect: {
+                        x: 13,
+                        y: $api.dom('#topLine').offsetTop + $api.dom('#topLine').offsetHeight,
+                        w: api.winWidth - 26,
+                        h: viewHeight
+                    },
+                    quality: "medium",
+                    saveToAlbum: true,
+                    save: {
+                        path: 'fs://videoRecorder',
+                        name: getTimeStr() + randomNum(1000, 9999)
+                    },
+                    fixedOn: api.frameName,
+                    fixed: false
+                }, function(ret) {
+                    if (ret) {
+                        console.log(JSON.stringify(ret));
+                        if (ret) {
+                            if (ret.eventType == 'finished') {
+                                var videoItem = {};
+                                videoItem.mediaType = 'video';
+                                videoItem.path = ret.filePath;
+                                videoItem.thumbPath = ret.thumbnailPath;
+                                videoItem.duration = ret.duration;
+                                videoItem.videoId = ret.videoId;
+                                that.selectedMediaList.push(videoItem);
+                                // 视频直接跳转下一步
+                                that.nextStep();
+                            }
+                        }
+                    }
+                });
+            },
+            startRecord() {
+                var that = this;
+                // 只能上传一个视频
+                var videoNum = that.getSelectedVideoNum();
+                console.log('videoNum ' + videoNum);
+                if (videoNum >= 1) {
+                    api.toast({
+                        msg: '已在相册中选择视频，不能再拍摄视频',
+                        location: 'middle'
+                    });
+                    return;
+                }
+
+                that.recordStatus = 1;
+                videoRecorder.start({});
+
+                that.secCount= 0;
+                if (that.timeInterval != undefined) {
+                    clearInterval(that.timeInterval);
+                }
+                that.timeInterval = setInterval(function () {
+                    that.secCount++;
+                }, 1000);
+            },
+            closeRecorder() {
+                this.recordStatus = 2;
+                clearInterval(this.timeInterval);
+                videoRecorder.close();
+            },
+            stopRecorder() {
+                this.recordStatus = 2;
+                clearInterval(this.timeInterval);
+                videoRecorder.stop();
+            },
+            nextStep() {
+                var that = this;
+                if (that.selectedMediaList.length == 0) {
+                    api.toast({
+                        msg: '未选择任何图片或视频',
+                        location: 'middle'
+                    });
+                    return;
+                }
+
+                $api.setStorage('selectedMediaList', that.selectedMediaList);
+
+                // 关闭拍照、拍视频组件
+                that.closePhotoTake();
+                that.closeRecorder();
+
+                var mediaType = that.getMediaType();
+                if (that.publishType == 'blog') {
+                    api.openWin({
+                        name: 'publish_blog',
+                        url: './publish_blog.html',
+                        pageParam: {
+                            mediaType: mediaType
+                        }
+                    });
+                } else if (that.publishType == 'goods') {
+                    api.openWin({
+                        name: 'publish_goods',
+                        url: '../goods/publish_goods.html',
+                        pageParam: {
+                            mediaType: mediaType
+                        }
+                    });
+                } else if (that.publishType == 'plan') {
+                    api.openWin({
+                        name: 'publish_blog',
+                        url: './publish_blog.html',
+                        pageParam: {
+                            mediaType: mediaType,
+                            isPlan: true
+                        }
+                    });
+                } else if (that.publishType == 'planCover') {
+                    api.execScript({
+                       name: 'plan_detail',
+                       script: 'uploadCover()'
+                    });
+                    api.closeWin();
+                } else if (that.publishType == 'userImage') {
+                    api.execScript({
+                       name: 'user_info',
+                       script: 'uploadUserImage()'
+                    });
+                    api.closeWin();
+                }
+            },
+            getMediaType() {
+                if (this.selectedMediaList.length == 0) {
+                    return '';
+                } else {
+                    return this.selectedMediaList[0].mediaType.toLowerCase();
+                }
+            },
+            getSelectedVideoNum() {
+                var num = 0;
+                for (var i = 0; i < this.selectedMediaList.length; i++) {
+                    var item = this.selectedMediaList[i];
+                    if (item.mediaType.toLowerCase() == 'video') {
+                        num++;
+                    }
+                }
+                return num;
+            },
+            checkChange(item, index) {
+                console.log(JSON.stringify(item));
+                var mediaType = this.getMediaType();
+                if (item.isChecked == true) {
+                    // 是否同时选择图片、视频，blog、plan有此限制，goods没有
+                    console.log('publishType ' + this.publishType);
+                    if ((this.publishType == 'blog' || this.publishType == 'plan')
+                        && mediaType != '' && mediaType != item.mediaType.toLowerCase()) {
+                        if (mediaType == 'image') {// 选择图片后，选择视频
+                            api.toast({
+                                msg: '您已选择图片，不能再选视频',
+                                location: 'middle'
+                            });
+                        } else {// 选择视频后，选择图片
+                            api.toast({
+                                msg: '您已选择视频，不能再选图片',
+                                location: 'middle'
+                            });
+                        }
+                        this.$set(item, 'isChecked', false);
+                        return;
+                    }
+
+                    if (this.publishType == 'planCover' || this.publishType == 'userImage') {
+                        if (this.selectedMediaList.length == 0) {
+                            this.selectedMediaList.push(item);
+                        } else {
+                            api.toast({
+                                msg: '只能选择一张图片',
+                                location: 'middle'
+                            });
+                            this.$set(item, 'isChecked', false);
+                        }
+                        return;
+                    }
+
+                    // 图片是否超过6张
+                    if (mediaType == 'image') {
+                        var totalNum = 0;
+                        for (var i = 0; i < this.albumMediaList.length; i++) {
+                            var curItem = this.albumMediaList[i];
+                            if (curItem.isChecked == true) {
+                                totalNum++;
+                            }
+                        }
+                        if (totalNum >= 7) {
+                            api.toast({
+                                msg: '最多选择6张',
+                                location: 'middle'
+                            });
+                            this.$set(item, 'isChecked', false);
+                            return;
+                        }
+                    }
+
+                    // 上次已选择视频，再次选择视频
+                    if (mediaType == 'video' && item.mediaType.toLowerCase() == 'video') {
+                        api.toast({
+                            msg: '只能选择一个视频',
+                            location: 'middle'
+                        });
+                        this.$set(item, 'isChecked', false);
+                        return;
+                    }
+                    this.selectedMediaList.push(item);
+                } else {// 取消勾选
+                    // 删除path相同的行
+                    for (var i = 0; i < this.selectedMediaList.length; i++) {
+                        var cacheItem = this.selectedMediaList[i];
+                        if (cacheItem.path == item.path) {
+                            this.selectedMediaList.splice(i, 1);
+                            return;
+                        }
+                    }
+                }
+                console.log(JSON.stringify(this.selectedMediaList));
+            },
+            getImgWidth() {
+                return (api.winWidth / 4) + 'px';
+            },
+            initData() {
+                var that = this;
+                if (api.systemType == 'ios') {// 如果是ios，必须加requestAlbumPermissions，否则安装完成后初次打开，读不到数据
+                    UIAlbumBrowser.requestAlbumPermissions({}, function(ret, err) {
+                        console.log('requestAlbumPermissions ret ' + JSON.stringify(ret) + ' err ' + JSON.stringify(err));
+                        if (ret) {
+                            if (ret.isAccessPermissions == true) {
+                                that.getFirstPage();
+                            } else {
+                                alert('请允许相册读取权限');
+                            }
+                        } else {
+                            alert(JSON.stringify(err));
+                        }
+                    });
+                } else {
+                    that.getFirstPage();
+                }
+            },
+            getFirstPage() {
+                var that = this;
+                var type = that.imageOnly ? 'image' : 'all'
+                api.showProgress({
+                    title: '加载中...'
+                });
+                UIAlbumBrowser.scan({
+                    type: type,
+                    count: 24,
+                    sort: {
+                        key: 'time',
+                        order: 'desc'
+                    },
+                    thumbnail: {
+                        w: 100,
+                        h: 100
+                    }
+                }, function(ret) {
+                    api.hideProgress();
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        that.albumMediaList = ret.list;
+                        that.albumTotal = ret.total;
+                        that.setChecked();
+                    }
+                });
+            },
+            getNextPage() {
+                var that = this;
+                // 这里必须加判断，如果超过总数，仍然调用fetch，不会产生回调，界面会一直显示加载中
+                if (that.albumMediaList.length >= that.albumTotal) {
+                    api.toast({
+                        msg: '没有更多内容',
+                        location: 'middle'
+                    });
+                    return;
+                }
+
+                api.showProgress({
+                    title: '加载中...'
+                });
+                UIAlbumBrowser.fetch(function(ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        // console.log(JSON.stringify(ret));
+                        if (ret.list.length > 0) {
+                            that.albumMediaList.push.apply(that.albumMediaList, ret.list);
+                        } else {
+                            api.toast({
+                                msg: '没有更多内容',
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                });
+            },
+            setChecked() {
+                var that = this;
+                // 如果从发布界面的加号返回的，则有上次选择的图片，要勾选
+                if (that.selectedMediaList.length > 0) {
+                    for (var i = 0; i < that.selectedMediaList.length; i++) {
+                        var cacheItem = that.selectedMediaList[i];
+                        for (var j = 0; j < that.albumMediaList.length; j++) {
+                            var albumItem = that.albumMediaList[j];
+                            if (albumItem.path == cacheItem.path) {
+                                that.$set(albumItem, 'isChecked', true);
+                            }
+                        }
+                    }
+                }
+            },
+            tabClick(index) {
+                // selectedTabIndex值还没更新，此时为上次的tab位置
+                if (this.selectedTabIndex == 0) {// 从照片跳转其他
+
+                } else if (this.selectedTabIndex == 1) {// 从拍照跳转其他
+                    this.closePhotoTake();
+                } else if (this.selectedTabIndex == 2) {// 从视频跳转其他
+                    if (this.recordStatus == 1) {// 录制中不能切换
+                        return;
+                    }
+                    this.closeRecorder();
+                }
+
+                this.selectedTabIndex = index;
+
+                // selectedTabIndex值已更新
+                if (this.selectedTabIndex == 0) {
+                    this.title = '图片和视频'
+                } else if (this.selectedTabIndex == 1) {
+                    this.title = '拍照'
+                    this.openPhotoTaker();
+                } else if (this.selectedTabIndex == 2) {
+                    this.title = '拍视频';
+                    this.openRecorder();
+                }
+            },
+
+        }
+    })
+</script>
+
+</html>

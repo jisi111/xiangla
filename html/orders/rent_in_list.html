@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>基本模板</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <style>
+        .aui-tab-item {
+            padding: 0 0.5rem;
+            font-size: 0.65rem;
+        }
+
+        .aui-active {
+            font-weight: bold;
+        }
+
+        .rent_name,
+        .rent_order {
+            overflow: hidden;
+            padding: 0.48rem 0.70rem 0.65rem;
+            background-color: var(--theme-color);
+            font-size: 0.78rem;
+        }
+
+        .rent_name>img {
+            width: 5.25rem;
+            height: 5.25rem;
+            float: left;
+            vertical-align: center;
+            margin-right: 0.45rem;
+        }
+
+        .rent_name>p,
+        .rent_order>p {
+            color: var(--theme-black);
+        }
+
+        .rent_name>.rent-commend {
+            margin-bottom: 0.75rem;
+            height: 1.92rem;
+        }
+
+        .rent_name>.rent-price1>span {
+            font-size: 1.2rem;
+            color: #E51C23;
+        }
+        /*订单详情*/
+
+        .rent_order {
+            border-top: 1px solid #F4F4F4;
+        }
+
+        .rent_order>p {
+            font-size: 0.7rem;
+            height: 1.2rem;
+            line-height: 1.2rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .rent_order>p>span {
+            float: right;
+        }
+
+        .rent_order>.details {
+            float: right;
+            color: #9E9E9E;
+        }
+
+        .rent_order>.details>img {
+            width: 0.55rem;
+            height: 0.55rem;
+            transform: rotate(180deg);
+            display: inline-block;
+        }
+
+        .rent_wait {
+            border-top: 1px solid #f4f4f4;
+            background-color: var(--theme-color);
+            overflow: hidden;
+            background-color: var(--theme-color);
+            font-size: 0.78rem;
+        }
+
+        .rent_wait> p {
+            font-size: 0.8rem;
+            color: #E51C23;
+        }
+
+        .rent_wait {
+            border-bottom: 0.5rem solid #F7F7F7;
+        }
+
+        .button {
+            text-align: center;
+            line-height: 1.31rem;
+            height: 1.31rem;
+            width: 3.51rem;
+            background-color: #E51C23;
+            color: var(--theme-color);
+            font-size: 0.7rem;
+            border-radius: 1.5rem;
+        }
+
+
+        .rent_wait>p>span {
+            margin-left: 1.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header class="aui-bar aui-bar-nav theme-bg header-fix">
+            <i class="aui-pull-left aui-iconfont aui-icon-left" @click='goBackPage' style="color: var(--theme-black);"></i>
+            <div class="aui-title" style="display: flex; ">
+                <div style="margin: 0 auto; display: flex;">
+                    <div style="" v-text='title'></div>
+                </div>
+            </div>
+        </header>
+        <!--高度至少1px才能有效偏移-->
+        <div id='first-el' style="height: 1px; "></div>
+        <div class='flex-row flex-between' id='topLine' style="width: 100%; position:fixed; top: 3.3rem; ">
+            <div class="aui-tab base-padding" style="width: 100%; ">
+                <div class="aui-tab-item" @click='tabClick(0)' v-bind:class='{"aui-active": selectedTabIndex == 0}'>待付款</div>
+                <div class="aui-tab-item" @click='tabClick(1)' v-bind:class='{"aui-active": selectedTabIndex == 1}'>待发货</div>
+                <div class="aui-tab-item" @click='tabClick(2)' v-bind:class='{"aui-active": selectedTabIndex == 2}'>待签收</div>
+                <div class="aui-tab-item" @click='tabClick(3)' v-bind:class='{"aui-active": selectedTabIndex == 3}'>租用中</div>
+                <div class="aui-tab-item" @click='tabClick(4)' v-bind:class='{"aui-active": selectedTabIndex == 4}'>押金</div>
+            </div>
+        </div>
+
+        <!-- 商品名称 -->
+        <div style="margin-top:2.3rem;">
+            <div class="rent_body" v-for='(item,index) in buyList'>
+                <div class="rent_name">
+                    <img :src="item.goods.cover" alt="图片">
+                    <p class='rent-commend aui-ellipsis-2 ' v-text='item.goods.title'></p>
+                    <p class='rent-price1'>月租:&nbsp;&nbsp;
+                        <span v-text="'￥' + item.goodsPrice"></span>
+                    </p>
+                    <p class='rent-price2'>押金: &nbsp;&nbsp;&nbsp;<span v-text='item.deposit'></span>元</p>
+                </div>
+                <!--订单详情  -->
+                <div class="rent_order">
+                    <p>订单号<span v-text='item.id'></span></p>
+                    <p>东家昵称<span v-text='item.seller.nickName'></span></p>
+                    <p>租期 <span v-text="item.rentTime + '个月'"></span></p>
+                    <p>起租期<span v-if='item.rentStartTime' v-text="item.rentStartTime.substring(0, 10)"></span></p>
+                    <p>结束期<span v-if='item.rentEndTime' v-text="item.rentEndTime.substring(0, 10)"></span></p>
+                    <p>交易时间<span v-text='item.createTime'></span></p>
+                    <p class='details' @click='gotoDetail(item)'>订单详情 <img src="../../image/gray_return.png" alt=""></p>
+                </div>
+                <!-- 等待租户付款 -->
+                <div class="rent_wait">
+                    <div v-show='selectedTabIndex == 0' class="flex-col">
+                      <div class="flex-row base-padding" >
+                        <div class="flex-1"></div>
+                        <span style='color:var(--theme-black);font-size:0.78rem;margin-top:0.5rem;'>合计</span>
+                        <span style="font-size:1.22rem;margin-left:0;color: #E51C23;">￥33600</span>
+                      </div>
+                        <div class="flex-row base-padding" style="margin-bottom:0.87rem; margin-top:0.65rem; align-items: center;"
+                            v-show='selectedTabIndex == 0'>
+                          <span style="margin-left:0; color:#E51C23;"
+                              v-text="item.expireTime + '前未付款，系统将关闭订单'"></span>
+                          <div class="flex-1"></div>
+                          <div class="button" @click='payOrders(item)'>付款</div>
+                        </div>
+                    </div>
+                    <div class='flex-row base-padding' v-show='selectedTabIndex == 1' style="padding:0.65rem;color: #E51C23;">
+                        已付款，等待东家发货
+                        <div class="flex-1"></div>
+                        <div class="button" @click='remindShip(item)'>
+                            提醒发货
+                        </div>
+                    </div>
+                    <p class='base-padding' v-show='selectedTabIndex == 2' style="margin-top:0.56rem;">
+                        东家已发货，请收到货后再确认钱款
+                        <span style='color:#9E9E9E; font-size: 0.6rem;margin-left: 0px; '>*发货后5日内租户未签收的，系统将自动确认租户已签收。</span>
+                    </p>
+                    <div class="base-padding" style="margin-bottom: 0.5rem;">
+                        <span class="button" v-show='selectedTabIndex == 2' @click='signReceive(item)'
+                            style='display:inline-block; padding: 0rem 1.05rem; margin-top:0.56rem; '>签收</span>
+                    </div>
+
+                    <div v-show='selectedTabIndex == 3' class='base-padding' style="padding-top:0.65rem;padding-bottom:0.65rem;">
+                        <div class="flex-row">
+                            <div style='color:#E51C23;margin-right:1.75rem;'>租用中</div>
+                            <span  style='color:#E51C23;' v-if='item.rentEndTime' v-text="'结束期' + item.rentEndTime.substring(0, 10)"></span>
+                        </div>
+                        <p style="overflow:hidden; padding-top:0.15rem;">
+                            <span class="button" style='display:inline-block; margin:0.56rem 0; '>续租</span>
+                        </p>
+                    </div>
+
+                    <p v-show='selectedTabIndex == 4 && item.status == 4' style="padding:0.65rem;">租期内&nbsp;/&nbsp;已交押金
+                        <span style="margin-left:0" v-text='item.deposit'></span>元
+                      <span class="button" style=" float:right;width:3.94rem;" @click='applyReturnDeposit(item)'>申请退押金</span>
+                    </p>
+                    <p v-show='selectedTabIndex == 4 && item.status == 5' style="padding:0.65rem;">待东家支付押金
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-dialog.js"></script>
+<script type="text/javascript" src="../../script/aui-toast.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/constant.js"></script>
+<script type="text/javascript" src="../../script/util.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        api.parseTapmode();
+        FastClick.attach(document.body);
+        $api.fixStatusBar($api.dom('header'));
+        $api.css($api.dom('#first-el'), 'margin-top: ' + $api.dom('header').offsetHeight + 'px');
+        if (api.systemType == 'ios') {
+            FastClick.prototype.focus = function(targetElement) {
+                targetElement.focus();
+            };
+        }
+
+        var params = api.pageParam; //页面传参
+        if (params.title) {
+            vm.title = params.title;
+        }
+        if (params.tabIndex) {
+            vm.selectedTabIndex = params.tabIndex;
+        }
+
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 0
+            }
+        }, function(ret, err) {
+            console.log('scrolltobottom');
+            vm.getNextPage();
+        });
+
+        api.addEventListener({
+            name: 'swipeleft'
+        }, function(ret, err) {
+            if (vm.selectedTabIndex >= 0 && vm.selectedTabIndex <= 4) {
+                vm.selectedTabIndex += 1;
+                vm.tabClick(vm.selectedTabIndex);
+                if (vm.selectedTabIndex >= 4) {
+                    vm.selectedTabIndex = 4;
+                }else if(vm.selectedTabIndex <=0){
+                  vm.selectedTabIndex = 0;
+                }
+            } else {
+            }
+        });
+
+        api.addEventListener({
+            name: 'swiperight'
+        }, function(ret, err) {
+          if (vm.selectedTabIndex >= 1 && vm.selectedTabIndex <= 4) {
+              vm.selectedTabIndex -= 1;
+              vm.tabClick(vm.selectedTabIndex);
+              if (vm.selectedTabIndex >=4) {
+                  vm.selectedTabIndex = 4;
+              }else if(vm.selectedTabIndex <=0){
+                vm.selectedTabIndex = 0;
+              }
+          } else {
+          }
+        });
+
+        vm.initData();
+    };
+
+    function refreshData() {
+        vm.getList();
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            title: '我租用的',
+            selectedTabIndex: 0,
+            queryParams: {
+                status: 1
+            },
+            page: {
+                current: 1,
+                size: 10,
+                pages: 0,
+                total: 0
+            },
+            buyList: [],
+        },
+        methods: {
+            goBackPage() {
+                api.closeToWin({
+                    name: 'root'
+                });
+            },
+            initData() {
+                if (this.selectedTabIndex == 0) {
+                    this.queryParams.status = 1; // 待支付
+                } else if (this.selectedTabIndex == 1) {
+                    this.queryParams.status = 2; // 已支付待发货
+                } else if (this.selectedTabIndex == 2) {
+                    this.queryParams.status = 3;
+                } else if (this.selectedTabIndex == 3) {
+                    this.queryParams.status = 4;
+                } else if (this.selectedTabIndex == 4) {
+                    that.queryParams.status = 5;
+                }
+                this.getList();
+            },
+            applyReturnDeposit(item) {
+                var that = this;
+                api.openFrame({
+                    name: 'deposit_flow',
+                    url: './deposit_flow.html',
+                    bgColor: 'rgba(0, 0, 0, 0.7)',
+                    pageParam: {
+                        ordersId: item.id
+                    },
+                    reload: true
+                });
+            },
+            signReceive(item) {
+                var that = this;
+                console.log(JSON.stringify(item));
+                var dialog = new auiDialog({})
+                dialog.alert({
+                    title:"提示",
+                    msg:'确定签收吗?',
+                    buttons:['取消', '确定']
+                },function(ret){
+                    console.log(JSON.stringify(ret));
+                    if (ret.buttonIndex == 2) {
+                        ajaxPost('/orders/signReceive', item.id, function(ret, err) {
+                            console.log(JSON.stringify(ret));
+                            if (ret) {
+                                if (ret.returnCode == '1') {
+                                    api.toast({
+                                        msg: '签收成功',
+                                        location: 'middle'
+                                    });
+                                    that.getList();
+                                } else {
+                                    api.toast({
+                                        msg: ret.returnMsg,
+                                        location: 'middle'
+                                    });
+                                }
+                            } else {
+                                api.toast({
+                                    msg: JSON.stringify(err),
+                                    location: 'middle'
+                                });
+                            }
+                        })
+                    }
+                })
+            },
+            remindShip(item) {
+                api.showProgress({
+                    title: '加载中...',
+                });
+                ajaxPost('/orders/remindShip', item.id, function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            var dialog = new auiDialog({})
+                            dialog.alert({
+                                title:"提示",
+                                msg:'已通知东家按时发货',
+                                buttons:['确定']
+                            },function(ret){
+                                console.log(ret)
+                            })
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            payOrders(item) {
+                console.log(JSON.stringify(item));
+                api.openWin({
+                    name: 'place_orders',
+                    url: '../orders/place_orders.html',
+                    pageParam: {
+                        goodsDetail: item.goods,
+                        buyerRentTime: item.rentTime,
+                        isOldOrders: true,
+                        oldOrdersId: item.id
+                    },
+                    reload: true
+                });
+            },
+            gotoDetail(item) {
+                api.openWin({
+                    name: 'orders_detail',
+                    url: './orders_detail.html',
+                    pageParam: {
+                        ordersId: item.id
+                    },
+                    reload: true
+                });
+            },
+            tabClick(index) {
+                var that = this;
+                that.page.current = 1;
+                that.selectedTabIndex = index;
+                console.log(index);
+                if (index == 0) {
+                    that.queryParams.status = 1;
+                } else if (index == 1) {
+                    that.queryParams.status = 2;
+                } else if (index == 2) {
+                    that.queryParams.status = 3;
+                } else if (index == 3) {
+                    that.queryParams.status = 4;
+                } else if (index == 4) {
+                    that.queryParams.status = 5;
+                }
+                var params = {
+                    queryParams: that.queryParams,
+                    page: that.page
+                };
+                console.log(params);
+                ajaxPost('/orders/getMyRentInList', params, function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.page = ret.data.page;
+                            if (that.page.current == 1) {
+                                that.buyList = ret.data.list;
+                            } else {
+                                that.buyList.push.apply(that.buyList, ret.data.list);
+                                api.pageDown(function(ret, err) {});
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            getList() {
+                var that = this;
+                var params = {
+                    queryParams: that.queryParams,
+                    page: that.page
+                };
+                console.log('params ' + JSON.stringify(params));
+                ajaxPost('/orders/getMyRentInList', params, function(ret, err) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        if (ret.returnCode == '1') {
+                            that.page = ret.data.page;
+                            if (that.page.current == 1) {
+                                that.buyList = ret.data.list;
+                            } else {
+                                that.buyList.push.apply(that.buyList, ret.data.list);
+                                api.pageDown(function(ret, err) {});
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.returnMsg,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: JSON.stringify(err),
+                            location: 'middle'
+                        });
+                    }
+                })
+            },
+            getNextPage() {
+                if (this.page.current >= this.page.pages) {
+                    api.toast({
+                        msg: '没有更多内容',
+                        location: 'middle'
+                    });
+                    return;
+                }
+                this.page.current++;
+                this.getList();
+            },
+        }
+    })
+</script>
+
+</html>
